@@ -12,8 +12,3 @@ COPY --from=builder /app /app
 WORKDIR /app/services/audit-ledger
 EXPOSE 8000
 CMD ["python", "-m", "uvicorn", "src.audit_ledger.main:app", "--host", "0.0.0.0", "--port", "8000"]
-
-
-
-
-

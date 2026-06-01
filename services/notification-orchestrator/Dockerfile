@@ -12,7 +12,3 @@ COPY --from=builder /app /app
 WORKDIR /app/services/notification-orchestrator
 EXPOSE 8000
 CMD ["python", "-m", "src.notification_orchestrator.main"]
-
-
-
-

@@ -12,7 +12,3 @@ COPY --from=builder /app /app
 WORKDIR /app/services/ocr-pipeline
 EXPOSE 8000
 CMD ["python", "-m", "src.ocr_pipeline.main"]
-
-
-
-

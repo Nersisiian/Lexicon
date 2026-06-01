@@ -12,7 +12,3 @@ COPY --from=builder /app /app
 WORKDIR /app/services/fraud-detection
 EXPOSE 8000
 CMD ["python", "-m", "src.fraud_detection.main"]
-
-
-
-
