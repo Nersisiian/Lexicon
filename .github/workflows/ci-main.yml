@@ -10,7 +10,13 @@ jobs:
         service: [intake-gateway, ocr-pipeline, document-classifier, compliance-engine, fraud-detection, reasoning-service, audit-ledger, review-workbench, notification-orchestrator]
     steps:
       - uses: actions/checkout@v4
-      - name: Build image
-        run: docker build -t ${{ matrix.service }}:latest services/${{ matrix.service }}/
-      - name: Push (placeholder)
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t ${{ matrix.service }}:latest \
+            -f services/${{ matrix.service }}/Dockerfile \
+            .
+
+      - name: Push image (placeholder)
         run: echo "Pushing to registry..."
