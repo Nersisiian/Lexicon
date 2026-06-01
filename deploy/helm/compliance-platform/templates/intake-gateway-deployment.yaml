@@ -1,0 +1,45 @@
+{{- if .Values.intake-gateway.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: intake-gateway
+  labels:
+    app: intake-gateway
+    {{- include "compliance.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.intake-gateway.replicas }}
+  selector:
+    matchLabels:
+      app: intake-gateway
+  template:
+    metadata:
+      labels:
+        app: intake-gateway
+    spec:
+      containers:
+        - name: intake-gateway
+          image: {{ .Values.global.imageRegistry }}/{{ .Values.intake-gateway.image }}:{{ .Values.intake-gateway.tag }}
+          ports:
+            - containerPort: {{ .Values.intake-gateway.service.port }}
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: {{ .Values.global.kafkaBootstrapServers }}
+            - name: DATABASE_URL
+              value: {{ .Values.intake-gateway.databaseUrl }}
+            - name: REDIS_URL
+              value: {{ .Values.intake-gateway.redisUrl }}
+            - name: MINIO_ENDPOINT
+              value: {{ .Values.intake-gateway.minio.endpoint }}
+            - name: MINIO_ACCESS_KEY
+              value: {{ .Values.intake-gateway.minio.accessKey }}
+            - name: MINIO_SECRET_KEY
+              value: {{ .Values.intake-gateway.minio.secretKey }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+{{- end }}

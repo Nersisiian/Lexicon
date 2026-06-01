@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "audit-ledger"
+version = "1.0.0"
+description = "Immutable audit log service"
+authors = ["Platform Team <platform@regulator.internal>"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.111"
+uvicorn = "^0.29"
+asyncpg = "^0.29"
+compliance-sdk = { path = "../../packages/compliance-sdk" }
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2"
+pytest-asyncio = "^0.23"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

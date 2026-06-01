@@ -1,0 +1,4 @@
+global:
+  environment: dev
+intake-gateway:
+  replicas: 1

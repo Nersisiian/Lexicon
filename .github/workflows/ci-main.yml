@@ -1,0 +1,16 @@
+name: CI Main
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [intake-gateway, ocr-pipeline, document-classifier, compliance-engine, fraud-detection, reasoning-service, audit-ledger, review-workbench, notification-orchestrator]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t ${{ matrix.service }}:latest services/${{ matrix.service }}/
+      - name: Push (placeholder)
+        run: echo "Pushing to registry..."

@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "ocr-pipeline"
+version = "3.1.0"
+description = "OCR processing service"
+authors = ["OCR Team <ocr@regulator.internal>"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+aiokafka = "^0.8"
+compliance-sdk = { path = "../../packages/compliance-sdk" }
+paddleocr = "^2.7"
+opencv-python-headless = "^4.9"
+tenacity = "^8.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2"
+pytest-asyncio = "^0.23"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

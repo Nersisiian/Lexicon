@@ -1,0 +1,15 @@
+name: Security Scan
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+jobs:
+  trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trivy scan
+        run: |
+          for svc in services/*/; do
+            docker build -t temp-image $svc
+            trivy image temp-image
+          done

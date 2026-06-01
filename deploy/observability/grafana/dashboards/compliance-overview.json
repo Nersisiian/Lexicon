@@ -1,0 +1,21 @@
+{
+  "title": "Compliance Platform Overview",
+  "panels": [
+    {
+      "title": "Document Ingestion Rate",
+      "targets": [
+        {
+          "expr": "rate(document_processed_total{status='received'}[5m])"
+        }
+      ]
+    },
+    {
+      "title": "Consumer Lag",
+      "targets": [
+        {
+          "expr": "kafka_consumer_lag_records"
+        }
+      ]
+    }
+  ]
+}

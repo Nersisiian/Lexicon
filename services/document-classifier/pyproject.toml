@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "document-classifier"
+version = "1.2.0"
+description = "Document classification service"
+authors = ["ML Team <ml@regulator.internal>"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+transformers = "^4.40"
+torch = "^2.3"
+aiokafka = "^0.8"
+compliance-sdk = { path = "../../packages/compliance-sdk" }
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2"
+pytest-asyncio = "^0.23"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

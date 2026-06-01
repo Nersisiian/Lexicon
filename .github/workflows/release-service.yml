@@ -1,0 +1,15 @@
+name: Release Service
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        required: true
+        type: choice
+        options: [intake-gateway, ocr-pipeline, document-classifier, compliance-engine, fraud-detection, reasoning-service, audit-ledger, review-workbench, notification-orchestrator]
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t ${{ github.event.inputs.service }}:${{ github.sha }} services/${{ github.event.inputs.service }}/
+      - run: echo "Tag and push to registry"
