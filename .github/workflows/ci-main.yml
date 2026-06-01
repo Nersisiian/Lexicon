@@ -13,10 +13,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build \
+          echo "Building ${{ matrix.service }}"
+          docker build --progress=plain \
             -t ${{ matrix.service }}:latest \
             -f services/${{ matrix.service }}/Dockerfile \
-            .
+            . 2>&1 | tee build.log
 
       - name: Push image (placeholder)
         run: echo "Pushing to registry..."
