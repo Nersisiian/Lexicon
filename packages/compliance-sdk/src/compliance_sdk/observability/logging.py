@@ -7,7 +7,6 @@ with JSON in staging/prod and coloured console in dev.
 from __future__ import annotations
 import os
 import structlog
-from structlog.types import Processor
 from opentelemetry import trace
 
 def _inject_trace_ids(logger, method_name, event_dict):

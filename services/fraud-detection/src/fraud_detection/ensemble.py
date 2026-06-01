@@ -1,6 +1,5 @@
 import pickle
 import structlog
-from sklearn.ensemble import RandomForestClassifier
 
 logger = structlog.get_logger(__name__)
 

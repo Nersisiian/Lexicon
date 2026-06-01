@@ -1,11 +1,9 @@
 from __future__ import annotations
-import asyncio
 import structlog
 from opentelemetry import trace
 from compliance_sdk.kafka import KafkaClient, ResilientConsumer
 from compliance_sdk.observability.metrics import processing_duration, document_processed
 from .engine import extract_text
-from .config import settings
 
 logger = structlog.get_logger(__name__)
 tracer = trace.get_tracer(__name__)

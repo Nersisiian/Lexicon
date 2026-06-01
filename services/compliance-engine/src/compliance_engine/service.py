@@ -2,7 +2,6 @@ from __future__ import annotations
 import structlog
 from opentelemetry import trace
 from compliance_sdk.kafka import KafkaClient, ResilientConsumer
-from compliance_sdk.observability.metrics import processing_duration
 from .rules.aml import AMLScorer
 from .rules.completeness import RULES_REGISTRY
 from .external.sanctions import SanctionsClient

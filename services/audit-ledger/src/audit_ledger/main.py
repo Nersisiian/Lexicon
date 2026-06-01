@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from compliance_sdk.observability.logging import configure_logging
 from compliance_sdk.observability.tracing import init_tracing
 from .api import router
-from .config import settings
 
 configure_logging()
 init_tracing("audit-ledger")

@@ -7,7 +7,7 @@ Refactored after INC-2025-08-14 to include per‑message retry budgets.
 
 from __future__ import annotations
 import asyncio
-from typing import AsyncIterator, Optional
+from typing import Optional
 from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 import structlog
 from opentelemetry import trace, context

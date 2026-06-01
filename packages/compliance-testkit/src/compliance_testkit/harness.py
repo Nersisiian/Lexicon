@@ -1,6 +1,5 @@
 """Test harness that spins up infrastructure containers."""
 import pytest
-import asyncio
 from testcontainers.postgres import PostgresContainer
 from testcontainers.kafka import KafkaContainer
 from testcontainers.redis import RedisContainer

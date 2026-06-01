@@ -8,7 +8,7 @@ In containerised deployments it is called from main.py.
 
 import asyncio
 import structlog
-from compliance_sdk.kafka import KafkaClient, ResilientConsumer
+from compliance_sdk.kafka import KafkaClient
 from compliance_sdk.observability.tracing import init_tracing
 from compliance_sdk.observability.logging import configure_logging
 from .config import settings

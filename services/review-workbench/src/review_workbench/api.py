@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from uuid import UUID
 from .service import ReviewService
 from .deps import get_review_service

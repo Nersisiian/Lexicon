@@ -1,3 +1,5 @@
+import json
+from .models import AuditEvent
 import asyncpg
 import structlog
 
@@ -23,7 +25,7 @@ class AuditRepository:
                 event.service, event.user_id, event.action, json.dumps(event.payload)
             )
 
-    async def get_by_id(self, event_id) -> event | None:
+    async def get_by_id(self, event_id) -> AuditEvent | None:
         pool = await self._get_pool()
         async with pool.acquire() as conn:
             row = await conn.fetchrow(

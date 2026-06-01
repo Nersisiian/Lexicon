@@ -19,7 +19,7 @@ class NotificationService:
     async def process(self, msg) -> None:
         doc_id = msg.key.decode()
         event_type = msg.topic
-        data = json.loads(msg.value)
+
         # Dispatch to appropriate channel
         if event_type == "document.reasoned":
             await self._send_slack(f"Document {doc_id} reasoning complete.")

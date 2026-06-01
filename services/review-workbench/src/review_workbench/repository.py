@@ -6,7 +6,6 @@ the rest of the platform and keep dependencies light.
 
 from __future__ import annotations
 from uuid import UUID
-from datetime import datetime, timezone
 import asyncpg
 import structlog
 from .models import ReviewTask

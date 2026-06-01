@@ -27,7 +27,7 @@ if config.config_file_name is not None:
 target_metadata = None
 
 # Override sqlalchemy.url with DATABASE_URL environment variable.
-from audit_ledger.config import settings as audit_settings
+from audit_ledger.config import settings as audit_settings  # noqa: E402
 config.set_main_option("sqlalchemy.url", str(audit_settings.DATABASE_URL))
 
 def run_migrations_offline() -> None:
