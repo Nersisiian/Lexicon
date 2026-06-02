@@ -1,4 +1,8 @@
 import json
+from opentelemetry import trace
+from compliance_sdk.observability.metrics import processing_duration
+logger = structlog.get_logger(__name__)
+tracer = trace.get_tracer(__name__)
 import structlog
 from compliance_sdk.kafka import ResilientConsumer, KafkaClient
 from .llm_client import LLMClient
@@ -27,7 +31,12 @@ class ReasoningService:
         self._kafka = kafka
         self._llm = LLMClient()
 
-    async def process(self, msg) -> None:
+    async def process(self, msg):
+        doc_id = msg.key.decode()
+        with tracer.start_as_current_span("reasoning") as span:
+            span.set_attribute("document_id", doc_id)
+            with processing_duration.labels(service="reasoning-service", stage="llm").time():
+                # ... -> None:
         doc_id = msg.key.decode()
         data = json.loads(msg.value)
         prompt = PROMPT_TEMPLATE.format(

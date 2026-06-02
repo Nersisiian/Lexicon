@@ -1,4 +1,8 @@
 import json
+from opentelemetry import trace
+from compliance_sdk.observability.metrics import processing_duration
+logger = structlog.get_logger(__name__)
+tracer = trace.get_tracer(__name__)
 import structlog
 from compliance_sdk.kafka import ResilientConsumer, KafkaClient
 from compliance_sdk.observability.metrics import document_processed
@@ -18,7 +22,12 @@ class FraudDetectionService:
         self._kafka = kafka
         self._model = FraudEnsemble(settings.MODEL_PATH)
 
-    async def process(self, msg) -> None:
+    async def process(self, msg):
+        doc_id = msg.key.decode()
+        with tracer.start_as_current_span("fraud.check") as span:
+            span.set_attribute("document_id", doc_id)
+            with processing_duration.labels(service="fraud-detection", stage="fraud").time():
+                # ... -> None:
         doc_id = msg.key.decode()
         data = json.loads(msg.value)
         # Extract features from compliance result; simplified here

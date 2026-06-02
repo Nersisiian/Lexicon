@@ -1,9 +1,4 @@
-"""OCR engine abstraction with legacy fallback.
-
-PLAT-412: Legacy tesserocr path still used for vector‑heavy PDFs
-because PaddleOCR struggles with CAD diagrams. Plan to replace with
-a dedicated rasterization pre‑processor by Q2 2026.
-"""
+"""OCR engine abstraction with legacy fallback."""
 from __future__ import annotations
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
@@ -11,12 +6,9 @@ import structlog
 from .config import settings
 
 logger = structlog.get_logger(__name__)
-
-# Legacy thread pool for blocking OCR; will be replaced by async gRPC engine.
 _legacy_executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="ocr-legacy")
 
 async def extract_text_paddle(image_bytes: bytes) -> str:
-    # Async-compatible wrapper around PaddleOCR
     from paddleocr import PaddleOCR
     ocr = PaddleOCR(use_angle_cls=True, lang='en', show_log=False)
     loop = asyncio.get_running_loop()
@@ -25,8 +17,10 @@ async def extract_text_paddle(image_bytes: bytes) -> str:
     return "\n".join(texts)
 
 async def extract_text_legacy(image_bytes: bytes) -> str:
+    import pytesseract
+    from PIL import Image
+    import io
     loop = asyncio.get_running_loop()
-    # pytesseract not imported here to keep dependency light
     return await loop.run_in_executor(_legacy_executor, _tesseract_ocr, image_bytes)
 
 def _tesseract_ocr(image_bytes):

@@ -1,4 +1,8 @@
 import json
+from opentelemetry import trace
+from compliance_sdk.observability.metrics import processing_duration
+logger = structlog.get_logger(__name__)
+tracer = trace.get_tracer(__name__)
 import httpx
 import structlog
 from compliance_sdk.kafka import ResilientConsumer, KafkaClient
@@ -16,7 +20,12 @@ class NotificationService:
         )
         self._kafka = kafka
 
-    async def process(self, msg) -> None:
+    async def process(self, msg):
+        doc_id = msg.key.decode()
+        with tracer.start_as_current_span("notification.dispatch") as span:
+            span.set_attribute("document_id", doc_id)
+            with processing_duration.labels(service="notification-orchestrator", stage="dispatch").time():
+                # ... -> None:
         doc_id = msg.key.decode()
         event_type = msg.topic
 
@@ -32,3 +41,4 @@ class NotificationService:
             return
         async with httpx.AsyncClient() as client:
             await client.post(settings.SLACK_WEBHOOK_URL, json={"text": text})
+
