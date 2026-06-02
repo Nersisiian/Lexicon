@@ -1,0 +1,108 @@
+global:
+  environment: production
+  imageRegistry: ghcr.io
+  imageOwner: nersisiian
+  imageRepo: lexicon
+  kafkaBootstrapServers: kafka:9092
+
+intake-gateway:
+  enabled: true
+  replicas: 2
+  image: intake-gateway
+  tag: latest
+  databaseUrl: postgresql+asyncpg://compliance:changeme@postgres:5432/intake
+  redisUrl: redis://redis:6379
+  minio:
+    endpoint: minio:9000
+    accessKey: minioadmin
+    secretKey: minioadmin
+  service:
+    port: 8000
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+ocr-pipeline:
+  enabled: true
+  replicas: 2
+  image: ocr-pipeline
+  tag: latest
+  env:
+    OCR_BACKEND: paddle
+    MAX_PAGES_PER_DOC: 15
+    PROCESSING_TIMEOUT: 25
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1.5Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+document-classifier:
+  enabled: true
+  replicas: 1
+  image: document-classifier
+  tag: latest
+  env:
+    MODEL_NAME: finreg-bert-classifier
+    DEVICE: cpu
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+compliance-engine:
+  enabled: true
+  replicas: 2
+  image: compliance-engine
+  tag: latest
+  env:
+    SANCTIONS_API_URL: http://sanctions-api:8080/search
+
+fraud-detection:
+  enabled: true
+  replicas: 1
+  image: fraud-detection
+  tag: latest
+
+reasoning-service:
+  enabled: true
+  replicas: 1
+  image: reasoning-service
+  tag: latest
+  env:
+    LLM_ENDPOINT: http://llm:8080/v1/completions
+
+audit-ledger:
+  enabled: true
+  replicas: 2
+  image: audit-ledger
+  tag: latest
+  databaseUrl: postgresql+asyncpg://compliance:changeme@postgres:5432/audit
+  service:
+    port: 8000
+
+review-workbench:
+  enabled: true
+  replicas: 2
+  image: review-workbench
+  tag: latest
+  databaseUrl: postgresql+asyncpg://compliance:changeme@postgres:5432/review
+  service:
+    port: 8000
+
+notification-orchestrator:
+  enabled: true
+  replicas: 1
+  image: notification-orchestrator
+  tag: latest
+  env:
+    SLACK_WEBHOOK_URL: https://hooks.slack.com/services/...

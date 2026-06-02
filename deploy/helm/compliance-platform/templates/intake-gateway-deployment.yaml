@@ -5,7 +5,6 @@ metadata:
   name: intake-gateway
   labels:
     app: intake-gateway
-    {{- include "compliance.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.intake-gateway.replicas }}
   selector:
@@ -18,7 +17,7 @@ spec:
     spec:
       containers:
         - name: intake-gateway
-          image: {{ .Values.global.imageRegistry }}/{{ .Values.intake-gateway.image }}:{{ .Values.intake-gateway.tag }}
+          image: {{ include "compliance.image" (dict "image" .Values.intake-gateway.image "tag" .Values.intake-gateway.tag) }}
           ports:
             - containerPort: {{ .Values.intake-gateway.service.port }}
           env:
