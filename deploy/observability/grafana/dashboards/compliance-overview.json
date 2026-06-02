@@ -1,21 +1,63 @@
 {
   "title": "Compliance Platform Overview",
+  "uid": "compliance-overview",
   "panels": [
     {
       "title": "Document Ingestion Rate",
+      "type": "graph",
       "targets": [
         {
-          "expr": "rate(document_processed_total{status='received'}[5m])"
+          "expr": "rate(document_processed_total{status='received'}[5m])",
+          "legendFormat": "received/sec"
         }
-      ]
+      ],
+      "gridPos": { "x": 0, "y": 0, "w": 8, "h": 8 }
     },
     {
       "title": "Consumer Lag",
+      "type": "graph",
       "targets": [
         {
-          "expr": "kafka_consumer_lag_records"
+          "expr": "kafka_consumer_lag_records",
+          "legendFormat": "{{ topic }} ({{ consumer_group }})"
         }
-      ]
+      ],
+      "gridPos": { "x": 8, "y": 0, "w": 8, "h": 8 }
+    },
+    {
+      "title": "Processing Duration (p99)",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(document_processing_seconds_bucket[5m])) by (le, stage))",
+          "legendFormat": "{{ stage }} p99"
+        }
+      ],
+      "gridPos": { "x": 16, "y": 0, "w": 8, "h": 8 }
+    },
+    {
+      "title": "Circuit Breakers",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "circuit_breaker_state",
+          "legendFormat": "{{ name }}"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 8, "w": 8, "h": 4 }
+    },
+    {
+      "title": "Fraud Flags",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "increase(document_processed_total{status='fraud_checked'}[1h])",
+          "legendFormat": "fraud checks/h"
+        }
+      ],
+      "gridPos": { "x": 8, "y": 8, "w": 8, "h": 4 }
     }
-  ]
+  ],
+  "schemaVersion": 27,
+  "version": 1
 }
