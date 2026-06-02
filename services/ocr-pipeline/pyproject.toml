@@ -6,7 +6,7 @@ authors = ["OCR Team <ocr@regulator.internal>"]
 
 [tool.poetry.dependencies]
 python = "^3.12"
-aiokafka = "^0.8"
+aiokafka = "^0.14"
 compliance-sdk = { path = "../../packages/compliance-sdk" }
 paddleocr = "^2.7"
 opencv-python-headless = "^4.9"

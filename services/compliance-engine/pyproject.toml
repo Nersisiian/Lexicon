@@ -6,7 +6,7 @@ authors = ["Compliance Team <compliance@regulator.internal>"]
 
 [tool.poetry.dependencies]
 python = "^3.12"
-aiokafka = "^0.8"
+aiokafka = "^0.14"
 compliance-sdk = { path = "../../packages/compliance-sdk" }
 httpx = "^0.27"
 

@@ -8,7 +8,7 @@ authors = ["ML Team <ml@regulator.internal>"]
 python = "^3.12"
 transformers = "^4.40"
 torch = "^2.3"
-aiokafka = "^0.8"
+aiokafka = "^0.14"
 compliance-sdk = { path = "../../packages/compliance-sdk" }
 
 [tool.poetry.group.dev.dependencies]
