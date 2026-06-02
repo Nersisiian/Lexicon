@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from uuid import UUID
 from .service import AuditService
 from .deps import get_audit_service
+import asyncpg
+from .config import settings
 
 router = APIRouter(prefix="/audit", tags=["audit"])
 
@@ -16,3 +18,13 @@ async def get_event(event_id: UUID, service: AuditService = Depends(get_audit_se
     if not event:
         raise HTTPException(404)
     return event.dict()
+
+@router.get("/health")
+async def health():
+    try:
+        conn = await asyncpg.connect(str(settings.DATABASE_URL))
+        await conn.close()
+        db_ok = True
+    except Exception:
+        db_ok = False
+    return {"status": "ok", "database": db_ok}
