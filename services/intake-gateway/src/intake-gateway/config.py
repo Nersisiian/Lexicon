@@ -3,7 +3,7 @@ that still use .env.legacy (PLAT-3421).
 """
 from __future__ import annotations
 from pathlib import Path
-from pydantic import BaseSettings, PostgresDsn
+from pydantic_settings import BaseSettings, PostgresDsn
 
 class Settings(BaseSettings):
     REGULATOR_ID: str = "default"

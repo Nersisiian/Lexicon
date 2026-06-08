@@ -5,6 +5,7 @@ description = "Shared utilities for the compliance platform"
 authors = ["Platform Team <platform@regulator.internal>"]
 
 [tool.poetry.dependencies]
+pydantic-settings = "^2.0"
 python = "^3.12"
 aiokafka = ">=0.14.0"
 structlog = ">=25.5.0"
@@ -22,3 +23,4 @@ redis = ["redis"]
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+

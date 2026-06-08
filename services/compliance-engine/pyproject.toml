@@ -5,6 +5,7 @@ description = "Regulatory compliance rule engine"
 authors = ["Compliance Team <compliance@regulator.internal>"]
 
 [tool.poetry.dependencies]
+pydantic-settings = "^2.0"
 python = "^3.12"
 aiokafka = "^0.14"
 compliance-sdk = { path = "../../packages/compliance-sdk" }
@@ -17,3 +18,4 @@ pytest-asyncio = "^0.23"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+

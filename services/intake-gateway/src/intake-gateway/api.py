@@ -2,7 +2,7 @@
 
 Deprecated v1 endpoint remains for legacy internal tools; will be removed Q4 2025 (PLAT-3421).
 """
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
+from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Response
 from .service import IntakeService
 from .deps import get_intake_service
 
@@ -29,7 +29,12 @@ async def health():
         kafka_ok = True
     except Exception:
         kafka_ok = False
-    return {"status": "ok", "kafka": kafka_ok}
+    status_code = 200 if kafka_ok else 503
+    return Response(
+        content='{"status":"ok","kafka":true}' if kafka_ok else '{"status":"degraded","kafka":false}',
+        media_type="application/json",
+        status_code=status_code,
+    )
 
 # Deprecated v1 endpoint – kept for backwards compatibility until all internal
 # tools migrate to /v2. Remove after PLAT-3421.

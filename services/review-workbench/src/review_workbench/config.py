@@ -1,4 +1,4 @@
-from pydantic import BaseSettings, PostgresDsn
+from pydantic_settings import BaseSettings, PostgresDsn
 
 class Settings(BaseSettings):
     DATABASE_URL: PostgresDsn

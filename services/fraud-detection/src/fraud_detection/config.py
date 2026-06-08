@@ -1,4 +1,4 @@
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     KAFKA_BOOTSTRAP_SERVERS: list[str] = ["kafka:9092"]

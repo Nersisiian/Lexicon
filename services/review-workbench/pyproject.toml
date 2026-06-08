@@ -5,6 +5,7 @@ description = "Human review workflow service"
 authors = ["Review Team <review@regulator.internal>"]
 
 [tool.poetry.dependencies]
+pydantic-settings = "^2.0"
 python = "^3.12"
 fastapi = "^0.111"
 uvicorn = "^0.29"
@@ -18,3 +19,4 @@ pytest-asyncio = "^0.23"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
