@@ -40,3 +40,55 @@ jobs:
           file: services/${{ matrix.service }}/Dockerfile
           push: true
           tags: ${{ env.IMAGE_PATH }}/${{ matrix.service }}:${{ github.sha }}
+
+  smoke-test:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Start staging environment
+        run: |
+          export GITHUB_SHA=${{ github.sha }}
+          docker compose -f deploy/docker-compose/docker-compose.staging.yml up -d
+
+      - name: Wait for services
+        run: |
+          for i in {1..30}; do
+            if curl -s -f http://localhost:8000/health > /dev/null; then
+              echo "Intake Gateway healthy"
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Upload test document
+        run: |
+          echo "Sample PDF" > /tmp/sample.pdf
+          RESP=$(curl -s -X POST http://localhost:8000/v2/documents \
+            -F "file=@/tmp/sample.pdf;type=application/pdf")
+          echo "Response: $RESP"
+          DOC_ID=$(echo "$RESP" | jq -r '.document_id')
+          echo "DOC_ID=$DOC_ID" >> $GITHUB_ENV
+
+      - name: Verify processing (wait + check Kafka)
+        run: |
+          sleep 20
+          docker compose -f deploy/docker-compose/docker-compose.staging.yml exec -T kafka \
+            kafka-console-consumer --topic document.ingested --bootstrap-server localhost:9092 \
+            --timeout-ms 10000 | grep "$DOC_ID"
+
+      - name: Collect logs on failure
+        if: failure()
+        run: docker compose -f deploy/docker-compose/docker-compose.staging.yml logs
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f deploy/docker-compose/docker-compose.staging.yml down -v
