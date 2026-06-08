@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, PostgresDsn
 
 class Settings(BaseSettings):
     REGULATOR_ID: str = "default"
-    KAFKA_BOOTSTRAP_SERVERS: list[str] = ["kafka:9092"]
+    KAFKA_BOOTSTRAP_SERVERS: str = "kafka:9092"
     DATABASE_URL: PostgresDsn
     REDIS_URL: str = "redis://redis:6379/0"
     MINIO_ENDPOINT: str = "minio:9000"
@@ -30,3 +30,4 @@ def _load_from_legacy_dotenv_if_present() -> Settings:
     return Settings()
 
 settings = _load_from_legacy_dotenv_if_present()
+
