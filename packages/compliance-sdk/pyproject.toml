@@ -13,7 +13,7 @@ opentelemetry-sdk = ">=1.42.1"
 opentelemetry-exporter-otlp-proto-http = ">=1.42.1"
 prometheus-client = ">=0.18"
 pydantic = ">=2.13.4"
-tenacity = ">=8.2"
+tenacity = ">=9.1.4"
 redis = { version = ">=5.0", optional = true }
 
 [tool.poetry.extras]
