@@ -1,4 +1,4 @@
-import asyncpg
+﻿import asyncpg
 import structlog
 from .domain.document import DocumentCreated
 
@@ -16,7 +16,6 @@ class DocumentRepository:
 
     @property
     def regulator_id(self) -> str:
-        # Would come from config; hardcoded for brevity
         return "default"
 
     async def save(self, doc: DocumentCreated) -> None:

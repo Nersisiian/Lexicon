@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+﻿from fastapi import FastAPI
 from compliance_sdk.observability.logging import configure_logging
 from compliance_sdk.observability.tracing import init_tracing
 from .api import router

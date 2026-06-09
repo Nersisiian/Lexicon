@@ -1,5 +1,4 @@
-from __future__ import annotations
-import structlog
+﻿import structlog
 from opentelemetry import trace
 from compliance_sdk.kafka import KafkaClient
 from compliance_sdk.observability.metrics import document_processed
@@ -27,7 +26,6 @@ class IntakeService:
             )
             doc = DocumentCreated(submission=submission)
             await self._repo.save(doc)
-            # Emit event for downstream services
             await self._kafka.publish(
                 "document.ingested",
                 key=str(doc.id),

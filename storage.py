@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+﻿from abc import ABC, abstractmethod
 from minio import Minio
 import structlog
 
@@ -13,7 +13,6 @@ class MinioObjectStore(ObjectStore):
     def __init__(self, endpoint: str, access_key: str, secret_key: str, bucket: str):
         self._client = Minio(endpoint, access_key=access_key, secret_key=secret_key, secure=False)
         self._bucket = bucket
-        # Ensure bucket exists; normally done once but here for robustness.
         if not self._client.bucket_exists(bucket):
             self._client.make_bucket(bucket)
 

@@ -1,4 +1,4 @@
-from functools import lru_cache
+﻿from functools import lru_cache
 from compliance_sdk.kafka import KafkaClient
 from .config import settings
 from .service import IntakeService
