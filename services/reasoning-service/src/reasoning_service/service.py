@@ -1,13 +1,12 @@
 import json
-from opentelemetry import trace
-from compliance_sdk.observability.metrics import processing_duration
-logger = structlog.get_logger(__name__)
-tracer = trace.get_tracer(__name__)
 import structlog
 from compliance_sdk.kafka import ResilientConsumer, KafkaClient
+from compliance_sdk.observability.metrics import document_processed
+from opentelemetry import trace
 from .llm_client import LLMClient
 
 logger = structlog.get_logger(__name__)
+tracer = trace.get_tracer(__name__)
 
 PROMPT_TEMPLATE = """
 You are a senior compliance analyst. Review the following document summary and highlight risks and gaps.
@@ -31,11 +30,7 @@ class ReasoningService:
         self._kafka = kafka
         self._llm = LLMClient()
 
-    async def process(self, msg):
-        doc_id = msg.key.decode()
-            span.set_attribute("document_id", doc_id)
-            with processing_duration.labels(service="reasoning-service", stage="llm").time():
-                # ... -> None:
+    async def process(self, msg) -> None:
         doc_id = msg.key.decode()
         data = json.loads(msg.value)
         prompt = PROMPT_TEMPLATE.format(
@@ -54,10 +49,8 @@ class ReasoningService:
             )
         except Exception:
             logger.exception("llm_failed", doc_id=doc_id)
-            # Don't block pipeline; publish empty reasoning
             await self._kafka.publish(
                 "document.reasoned",
                 key=doc_id,
                 value=json.dumps({"reasoning": "LLM unavailable"}).encode(),
             )
-

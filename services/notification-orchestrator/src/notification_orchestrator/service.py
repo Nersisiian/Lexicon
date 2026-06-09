@@ -1,11 +1,8 @@
 import json
-from opentelemetry import trace
-from compliance_sdk.observability.metrics import processing_duration
-logger = structlog.get_logger(__name__)
-tracer = trace.get_tracer(__name__)
 import httpx
 import structlog
 from compliance_sdk.kafka import ResilientConsumer, KafkaClient
+from compliance_sdk.observability.metrics import processing_duration
 from .config import settings
 
 logger = structlog.get_logger(__name__)
@@ -20,15 +17,10 @@ class NotificationService:
         )
         self._kafka = kafka
 
-    async def process(self, msg):
-        doc_id = msg.key.decode()
-            span.set_attribute("document_id", doc_id)
-            with processing_duration.labels(service="notification-orchestrator", stage="dispatch").time():
-                # ... -> None:
+    async def process(self, msg) -> None:
         doc_id = msg.key.decode()
         event_type = msg.topic
-
-        # Dispatch to appropriate channel
+        logger.info("notification_dispatch", doc_id=doc_id, event=event_type)
         if event_type == "document.reasoned":
             await self._send_slack(f"Document {doc_id} reasoning complete.")
         elif event_type == "document.review":
@@ -40,5 +32,3 @@ class NotificationService:
             return
         async with httpx.AsyncClient() as client:
             await client.post(settings.SLACK_WEBHOOK_URL, json={"text": text})
-
-
