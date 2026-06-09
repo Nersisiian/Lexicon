@@ -1,4 +1,5 @@
-from pydantic_settings import BaseSettings, PostgresDsn
+from pydantic_settings import BaseSettings
+from pydantic import PostgresDsn
 
 class Settings(BaseSettings):
     DATABASE_URL: PostgresDsn
@@ -7,4 +8,5 @@ class Settings(BaseSettings):
         env_file = ".env"
 
 settings = Settings()
+
 

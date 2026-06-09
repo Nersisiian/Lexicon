@@ -12,3 +12,4 @@ COPY --from=builder /app /app
 WORKDIR /app/services/reasoning-service
 EXPOSE 8000
 CMD ["python", "-m", "src.reasoning_service.main"]
+

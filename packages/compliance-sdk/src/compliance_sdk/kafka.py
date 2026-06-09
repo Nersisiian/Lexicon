@@ -115,3 +115,4 @@ class ResilientConsumer:
                             await asyncio.sleep(2 ** retry_count)
             context.detach(token)
 
+

@@ -22,7 +22,6 @@ class NotificationService:
 
     async def process(self, msg):
         doc_id = msg.key.decode()
-        with tracer.start_as_current_span("notification.dispatch") as span:
             span.set_attribute("document_id", doc_id)
             with processing_duration.labels(service="notification-orchestrator", stage="dispatch").time():
                 # ... -> None:
@@ -41,4 +40,5 @@ class NotificationService:
             return
         async with httpx.AsyncClient() as client:
             await client.post(settings.SLACK_WEBHOOK_URL, json={"text": text})
+
 

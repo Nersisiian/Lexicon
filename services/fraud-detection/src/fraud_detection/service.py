@@ -24,7 +24,6 @@ class FraudDetectionService:
 
     async def process(self, msg):
         doc_id = msg.key.decode()
-        with tracer.start_as_current_span("fraud.check") as span:
             span.set_attribute("document_id", doc_id)
             with processing_duration.labels(service="fraud-detection", stage="fraud").time():
                 # ... -> None:
@@ -41,3 +40,4 @@ class FraudDetectionService:
             key=doc_id,
             value=json.dumps(result).encode(),
         )
+

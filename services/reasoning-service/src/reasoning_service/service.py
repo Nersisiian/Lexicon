@@ -33,7 +33,6 @@ class ReasoningService:
 
     async def process(self, msg):
         doc_id = msg.key.decode()
-        with tracer.start_as_current_span("reasoning") as span:
             span.set_attribute("document_id", doc_id)
             with processing_duration.labels(service="reasoning-service", stage="llm").time():
                 # ... -> None:
@@ -61,3 +60,4 @@ class ReasoningService:
                 key=doc_id,
                 value=json.dumps({"reasoning": "LLM unavailable"}).encode(),
             )
+

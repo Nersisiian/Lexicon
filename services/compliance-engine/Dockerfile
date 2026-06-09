@@ -13,3 +13,4 @@ WORKDIR /app/services/compliance-engine
 EXPOSE 8000
 CMD ["python", "-m", "src.compliance_engine.main"]
 
+

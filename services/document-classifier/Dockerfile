@@ -12,3 +12,4 @@ COPY --from=builder /app /app
 WORKDIR /app/services/document-classifier
 EXPOSE 8000
 CMD ["python", "-m", "src.document_classifier.main"]
+
