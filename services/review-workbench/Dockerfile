@@ -11,6 +11,7 @@ COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/pytho
 COPY --from=builder /app /app
 WORKDIR /app/services/review-workbench
 EXPOSE 8000
-CMD [`"python`", `"-m`", `"uvicorn`", `"src.review_workbench.main:app`", `"--host`", `"0.0.0.0`", `"--port`", `"8000`"]
+CMD ["python", "-m", "uvicorn", "src.review_workbench.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
 
 
