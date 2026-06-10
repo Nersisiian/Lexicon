@@ -19,7 +19,7 @@ class KafkaClient:
     """Shared producer used across services. Must be started before publishing."""
 
     def __init__(self, bootstrap_servers: str, service_name: str):
-        self.bootstrap_servers = [s.strip() for s in bootstrap_servers.split(',')]
+        self.bootstrap_servers = [bootstrap_servers] if isinstance(bootstrap_servers, str) else list(bootstrap_servers)
         self.service_name = service_name
         self._producer: Optional[AIOKafkaProducer] = None
         self.tracer = trace.get_tracer(service_name)
@@ -60,7 +60,7 @@ class ResilientConsumer:
         dlq_topic: str,
         max_retries: int = 3,
     ):
-        self.bootstrap_servers = [s.strip() for s in bootstrap_servers.split(',')]
+        self.bootstrap_servers = [bootstrap_servers] if isinstance(bootstrap_servers, str) else list(bootstrap_servers)
         self.group_id = group_id
         self.topics = topics
         self.dlq_topic = dlq_topic
@@ -114,5 +114,6 @@ class ResilientConsumer:
                         else:
                             await asyncio.sleep(2 ** retry_count)
             context.detach(token)
+
 
 
