@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from io import BytesIO
 from minio import Minio
 import structlog
 
@@ -20,5 +21,7 @@ class MinioObjectStore(ObjectStore):
         import asyncio
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(
-            None, self._client.put_object, self._bucket, key, data, len(data)
+            None,
+            self._client.put_object,
+            self._bucket, key, BytesIO(data), len(data)
         )

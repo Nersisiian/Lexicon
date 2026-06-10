@@ -1,4 +1,15 @@
 import asyncio
+
+import time
+import socket
+# ∆дЄм, пока Kafka не станет доступна
+for _ in range(30):
+    try:
+        s = socket.create_connection(("kafka", 9092), timeout=2)
+        s.close()
+        break
+    except:
+        time.sleep(1)
 from compliance_sdk.observability.logging import configure_logging
 from compliance_sdk.observability.tracing import init_tracing
 from compliance_sdk.kafka import KafkaClient
