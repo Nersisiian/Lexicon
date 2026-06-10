@@ -1,5 +1,4 @@
 services:
-  # ---------- инфраструктура ----------
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     environment:
@@ -11,6 +10,8 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
     depends_on:
       - zookeeper
   postgres:
@@ -39,7 +40,6 @@ services:
       exit 0;
       "
 
-  # ---------- сервисы ----------
   intake-gateway:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:
@@ -68,12 +68,6 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       OCR_BACKEND: paddle
-      DEPLOY_ENV: staging
-    depends_on:
-      - kafka
-
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       DEPLOY_ENV: staging
     depends_on:
       - kafka
@@ -146,8 +140,3 @@ services:
       DEPLOY_ENV: staging
     depends_on:
       - kafka
-
-
-
-
-
