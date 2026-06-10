@@ -82,6 +82,10 @@ jobs:
           RESP=$(curl -s -X POST http://localhost:8000/v2/documents \
             -F "file=@/tmp/sample.pdf;type=application/pdf")
           echo "Response: $RESP"
+          if echo "$RESP" | grep -q 'Internal Server Error'; then
+            docker compose -f deploy/docker-compose/docker-compose.staging.yml logs intake-gateway
+            exit 1
+          fi
           DOC_ID=$(echo "$RESP" | jq -r '.document_id')
           echo "DOC_ID=$DOC_ID" >> $GITHUB_ENV
 
@@ -99,4 +103,5 @@ jobs:
       - name: Tear down
         if: always()
         run: docker compose -f deploy/docker-compose/docker-compose.staging.yml down -v
+
 
