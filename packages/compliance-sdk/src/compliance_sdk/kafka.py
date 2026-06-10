@@ -1,10 +1,4 @@
-"""Kafka client wrappers with built-in tracing, retries, and DLQ support.
-
-All services use these abstractions to ensure uniform error handling,
-trace propagation, and DLQ routing per the platform's SLOs.
-Refactored after INC-2025-08-14 to include per‑message retry budgets.
-"""
-
+"""Kafka client wrappers with built-in tracing, retries, and DLQ support."""
 from __future__ import annotations
 import asyncio
 from typing import Optional
@@ -16,10 +10,8 @@ from .observability.tracing import inject_ctx_to_kafka, extract_ctx_from_kafka
 logger = structlog.get_logger(__name__)
 
 class KafkaClient:
-    """Shared producer used across services. Must be started before publishing."""
-
     def __init__(self, bootstrap_servers: str, service_name: str):
-        self.bootstrap_servers = [bootstrap_servers] if isinstance(bootstrap_servers, str) else list(bootstrap_servers)
+        self.bootstrap_servers = bootstrap_servers.split(",")
         self.service_name = service_name
         self._producer: Optional[AIOKafkaProducer] = None
         self.tracer = trace.get_tracer(service_name)
@@ -44,23 +36,16 @@ class KafkaClient:
             logger.exception("kafka_publish_failed", topic=topic, key=key)
             raise
 
-
 class ResilientConsumer:
-    """Consumer that implements per-message retries and DLQ routing.
-
-    After max_retries attempts, the message is sent to dlq_topic and committed.
-    This prevents a single poison message from blocking the entire partition.
-    """
-
     def __init__(
         self,
-        bootstrap_servers: list[str],
+        bootstrap_servers: str,
         group_id: str,
         topics: list[str],
         dlq_topic: str,
         max_retries: int = 3,
     ):
-        self.bootstrap_servers = [bootstrap_servers] if isinstance(bootstrap_servers, str) else list(bootstrap_servers)
+        self.bootstrap_servers = bootstrap_servers.split(",")
         self.group_id = group_id
         self.topics = topics
         self.dlq_topic = dlq_topic
@@ -80,10 +65,8 @@ class ResilientConsumer:
         await asyncio.gather(self._consumer.start(), self._producer.start())
 
     async def stop(self) -> None:
-        if self._consumer:
-            await self._consumer.stop()
-        if self._producer:
-            await self._producer.stop()
+        if self._consumer: await self._consumer.stop()
+        if self._producer: await self._producer.stop()
 
     async def consume(self, handler) -> None:
         async for msg in self._consumer:
@@ -114,6 +97,3 @@ class ResilientConsumer:
                         else:
                             await asyncio.sleep(2 ** retry_count)
             context.detach(token)
-
-
-
