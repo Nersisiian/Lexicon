@@ -106,8 +106,13 @@ jobs:
             sleep 2
           done
 
+      - name: Initialize database
+        run: |
+          docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T postgres psql -U test -d test -c "CREATE TABLE IF NOT EXISTS documents (id UUID PRIMARY KEY, regulator_id TEXT NOT NULL, filename TEXT NOT NULL, content_type TEXT NOT NULL, s3_key_raw TEXT NOT NULL, status TEXT NOT NULL, created_at TIMESTAMP NOT NULL DEFAULT NOW(), updated_at TIMESTAMP NOT NULL DEFAULT NOW());"
+
       - name: Upload document and verify Kafka message
         run: |
+          sleep 5
           echo "Test PDF" > /tmp/sample.pdf
           RESP=$(curl -s -X POST http://localhost:8000/v2/documents \
             -F "file=@/tmp/sample.pdf;type=application/pdf")
@@ -122,4 +127,3 @@ jobs:
       - name: Cleanup
         if: always()
         run: docker compose -f deploy/docker-compose/docker-compose.test.yml down -v
-
