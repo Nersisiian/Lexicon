@@ -31,4 +31,15 @@ async def main():
         await kafka.stop()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    
+# ∆дЄм, пока Kafka не станет доступна
+import time, socket
+for _ in range(30):
+    try:
+        s = socket.create_connection(("kafka", 9092), timeout=2)
+        s.close()
+        break
+    except:
+        time.sleep(1)
+asyncio.run(main())
+

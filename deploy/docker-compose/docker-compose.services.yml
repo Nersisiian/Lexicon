@@ -5,7 +5,7 @@ services:
       context: ../..
       dockerfile: services/intake-gateway/Dockerfile
     environment:
-      DATABASE_URL: postgresql+asyncpg://compliance:compliance@postgres:5432/intake
+      DATABASE_URL: postgresql://compliance:compliance@postgres:5432/intake
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REDIS_URL: redis://redis:6379/0
       MINIO_ACCESS_KEY: minioadmin
@@ -62,7 +62,7 @@ services:
       context: ../..
       dockerfile: services/audit-ledger/Dockerfile
     environment:
-      DATABASE_URL: postgresql+asyncpg://compliance:compliance@postgres:5432/audit
+      DATABASE_URL: postgresql://compliance:compliance@postgres:5432/audit
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "8001:8000"
@@ -74,7 +74,7 @@ services:
       context: ../..
       dockerfile: services/review-workbench/Dockerfile
     environment:
-      DATABASE_URL: postgresql+asyncpg://compliance:compliance@postgres:5432/review
+      DATABASE_URL: postgresql://compliance:compliance@postgres:5432/review
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "8002:8000"
@@ -89,6 +89,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - kafka
+
 
 
 

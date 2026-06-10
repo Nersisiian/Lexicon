@@ -44,7 +44,7 @@ services:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      DATABASE_URL: postgresql+asyncpg://staging:staging_pass@postgres:5432/intake
+      DATABASE_URL: postgresql://staging:staging_pass@postgres:5432/intake
       REDIS_URL: redis://redis:6379/0
       MINIO_ENDPOINT: minio:9000
       MINIO_ACCESS_KEY: minioadmin
@@ -110,7 +110,7 @@ services:
     image: ghcr.io/nersisiian/lexicon/audit-ledger:${GITHUB_SHA:-latest}
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      DATABASE_URL: postgresql+asyncpg://staging:staging_pass@postgres:5432/audit
+      DATABASE_URL: postgresql://staging:staging_pass@postgres:5432/audit
       DEPLOY_ENV: staging
     ports:
       - "8001:8000"
@@ -127,7 +127,7 @@ services:
     image: ghcr.io/nersisiian/lexicon/review-workbench:${GITHUB_SHA:-latest}
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      DATABASE_URL: postgresql+asyncpg://staging:staging_pass@postgres:5432/review
+      DATABASE_URL: postgresql://staging:staging_pass@postgres:5432/review
       DEPLOY_ENV: staging
     ports:
       - "8002:8000"
@@ -148,5 +148,6 @@ services:
       DEPLOY_ENV: staging
     depends_on:
       - kafka
+
 
 
