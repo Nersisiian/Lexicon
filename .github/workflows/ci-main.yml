@@ -122,3 +122,4 @@ jobs:
       - name: Cleanup
         if: always()
         run: docker compose -f deploy/docker-compose/docker-compose.test.yml down -v
+
