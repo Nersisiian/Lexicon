@@ -77,3 +77,48 @@ jobs:
       - name: Cleanup
         if: always()
         run: docker rm -f intake || true
+
+  integration-test:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Start test environment
+        run: |
+          export GITHUB_SHA=${{ github.sha }}
+          docker compose -f deploy/docker-compose/docker-compose.test.yml up -d
+
+      - name: Wait for Kafka
+        run: |
+          for i in {1..60}; do
+            if docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T kafka kafka-broker-api-versions --bootstrap-server localhost:9092 &>/dev/null; then
+              echo "Kafka ready"
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Upload document and verify Kafka message
+        run: |
+          echo "Test PDF" > /tmp/sample.pdf
+          RESP=$(curl -s -X POST http://localhost:8000/v2/documents \
+            -F "file=@/tmp/sample.pdf;type=application/pdf")
+          echo "Response: $RESP"
+          DOC_ID=$(echo "$RESP" | jq -r '.document_id')
+          echo "Document ID: $DOC_ID"
+          sleep 15
+          docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T kafka \
+            kafka-console-consumer --topic document.ingested --bootstrap-server localhost:9092 \
+            --timeout-ms 15000 | grep "$DOC_ID"
+
+      - name: Cleanup
+        if: always()
+        run: docker compose -f deploy/docker-compose/docker-compose.test.yml down -v
