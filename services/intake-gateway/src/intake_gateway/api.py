@@ -21,23 +21,11 @@ async def upload_document(
 
 @router.get("/health")
 async def health():
-    from aiokafka import AIOKafkaProducer
-    try:
-        producer = AIOKafkaProducer(bootstrap_servers="kafka:9092")
-        await producer.start()
-        await producer.stop()
-        kafka_ok = True
-    except Exception:
-        kafka_ok = False
-    status_code = 200 if kafka_ok else 503
-    return Response(
-        content='{"status":"ok","kafka":true}' if kafka_ok else '{"status":"degraded","kafka":false}',
-        media_type="application/json",
-        status_code=status_code,
-    )
+    return {"status": "ok"}
 
 # Deprecated v1 endpoint – kept for backwards compatibility until all internal
 # tools migrate to /v2. Remove after PLAT-3421.
 @router.post("/documents", deprecated=True)
 async def upload_v1(file: UploadFile = File(...)):
     raise HTTPException(410, detail="Use POST /v2/documents")
+
