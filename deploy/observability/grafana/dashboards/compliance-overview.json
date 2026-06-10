@@ -1,6 +1,5 @@
 {
   "title": "Compliance Platform Overview",
-  "uid": "compliance-overview",
   "panels": [
     {
       "title": "Document Ingestion Rate",
@@ -45,19 +44,6 @@
         }
       ],
       "gridPos": { "x": 0, "y": 8, "w": 8, "h": 4 }
-    },
-    {
-      "title": "Fraud Flags",
-      "type": "stat",
-      "targets": [
-        {
-          "expr": "increase(document_processed_total{status='fraud_checked'}[1h])",
-          "legendFormat": "fraud checks/h"
-        }
-      ],
-      "gridPos": { "x": 8, "y": 8, "w": 8, "h": 4 }
     }
-  ],
-  "schemaVersion": 27,
-  "version": 1
+  ]
 }

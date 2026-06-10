@@ -17,3 +17,6 @@ services:
 	docker-compose -f deploy/docker-compose/docker-compose.services.yml up -d
 
 run: infra services
+.PHONY: run-obs
+run-obs:
+docker-compose -f deploy/docker-compose/docker-compose.observability.yml up -d

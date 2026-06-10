@@ -7,7 +7,7 @@ scrape_configs:
     relabel_configs:
       - source_labels: [__meta_kubernetes_pod_label_app]
         action: keep
-        regex: intake-gateway|ocr-pipeline|compliance-engine
+        regex: intake-gateway|ocr-pipeline|compliance-engine|audit-ledger|review-workbench|fraud-detection|reasoning-service|notification-orchestrator|document-classifier
   - job_name: 'opentelemetry-collector'
     static_configs:
       - targets: ['otel-collector:8889']
