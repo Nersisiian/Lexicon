@@ -2,6 +2,7 @@ FROM python:3.12-slim AS builder
 WORKDIR /app
 COPY packages/compliance-sdk /app/packages/compliance-sdk
 COPY services/audit-ledger /app/services/audit-ledger
+# force rebuild 20260610191839
 WORKDIR /app/services/audit-ledger
 RUN pip install poetry && poetry config virtualenvs.create false && rm -f poetry.lock && poetry install --no-root
 

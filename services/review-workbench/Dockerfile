@@ -2,6 +2,7 @@ FROM python:3.12-slim AS builder
 WORKDIR /app
 COPY packages/compliance-sdk /app/packages/compliance-sdk
 COPY services/review-workbench /app/services/review-workbench
+# force rebuild 20260610191839
 WORKDIR /app/services/review-workbench
 RUN pip install poetry && poetry config virtualenvs.create false && rm -f poetry.lock && poetry install --no-root
 
