@@ -140,3 +140,4 @@ services:
       DEPLOY_ENV: staging
     depends_on:
       - kafka
+
