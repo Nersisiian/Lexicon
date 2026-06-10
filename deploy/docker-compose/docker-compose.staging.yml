@@ -72,8 +72,6 @@ services:
     depends_on:
       - kafka
 
-  document-classifier:
-    image: ghcr.io/nersisiian/lexicon/document-classifier:${GITHUB_SHA:-latest}
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       DEPLOY_ENV: staging
