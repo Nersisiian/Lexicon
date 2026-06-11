@@ -20,3 +20,4 @@ CMD ["python", "-m", "uvicorn", "intake_gateway.main:app", "--host", "0.0.0.0", 
 # force rebuild 20260611234426
 
 # force rebuild 20260611235639
+# force rebuild 20260612000553
