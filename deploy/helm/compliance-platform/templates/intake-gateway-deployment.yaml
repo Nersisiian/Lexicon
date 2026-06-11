@@ -1,9 +1,12 @@
+{{- if .Values.intake-gateway.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: intake-gateway
+  labels:
+    app: intake-gateway
 spec:
-  replicas: 1
+  replicas: {{ .Values.intake-gateway.replicas }}
   selector:
     matchLabels:
       app: intake-gateway
@@ -14,7 +17,28 @@ spec:
     spec:
       containers:
         - name: intake-gateway
-          image: nginx:alpine
+          image: {{ include "compliance.image" (dict "image" .Values.intake-gateway.image "tag" .Values.intake-gateway.tag) }}
           ports:
-            - containerPort: 80
-
+            - containerPort: {{ .Values.intake-gateway.service.port }}
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: {{ .Values.global.kafkaBootstrapServers }}
+            - name: DATABASE_URL
+              value: {{ .Values.intake-gateway.databaseUrl }}
+            - name: REDIS_URL
+              value: {{ .Values.intake-gateway.redisUrl }}
+            - name: MINIO_ENDPOINT
+              value: {{ .Values.intake-gateway.minio.endpoint }}
+            - name: MINIO_ACCESS_KEY
+              value: {{ .Values.intake-gateway.minio.accessKey }}
+            - name: MINIO_SECRET_KEY
+              value: {{ .Values.intake-gateway.minio.secretKey }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+{{- end }}

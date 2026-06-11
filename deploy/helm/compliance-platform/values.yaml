@@ -9,7 +9,7 @@ global:
 intake-gateway:
   enabled: true
   replicas: 1
-  image: intake-gateway
+  image: nersisiian/lexicon/intake-gateway
   tag: latest
   databaseUrl: postgresql://compliance:${POSTGRES_PASSWORD:-compliance}@postgres:5432/intake
   redisUrl: redis://redis:6379
@@ -105,4 +105,6 @@ notification-orchestrator:
   tag: latest
   env:
     SLACK_WEBHOOK_URL: https://hooks.slack.com/services/...
+
+
 

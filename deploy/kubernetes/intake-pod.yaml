@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: intake-gateway
+  namespace: compliance
+  labels:
+    app: intake-gateway
+spec:
+  containers:
+    - name: intake-gateway
+      image: lexicon/intake-gateway:local
+      ports:
+        - containerPort: 8000
+      env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:9092"
+        - name: DATABASE_URL
+          value: "postgresql://test:test@postgres:5432/test"
+        - name: MINIO_ACCESS_KEY
+          value: ""
+        - name: MINIO_SECRET_KEY
+          value: ""
+        - name: REGULATOR_ID
+          value: "test-regulator"
