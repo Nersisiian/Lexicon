@@ -1,7 +1,11 @@
 name: CD Deploy
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag to deploy'
+        required: false
+        default: 'stable'
 
 jobs:
   deploy:
@@ -24,5 +28,5 @@ jobs:
         run: |
           helm upgrade --install compliance deploy/helm/compliance-platform \
             --namespace compliance --create-namespace \
-            --set global.imageTag=${{ github.sha }} \
+            --set global.imageTag=${{ github.event.inputs.tag }} \
             -f deploy/helm/compliance-platform/values-production.yaml
