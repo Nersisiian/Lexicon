@@ -5,6 +5,7 @@ description = "Document ingestion gateway"
 authors = ["Ingestion Team <ingestion@regulator.internal>"]
 
 [tool.poetry.dependencies]
+slowapi = "^1.0"
 pydantic-settings = "^2.0"
 python = "^3.12"
 fastapi = "^0.111"
@@ -21,4 +22,5 @@ minio = "^7.2"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
 

@@ -8,8 +8,8 @@ services:
       DATABASE_URL: postgresql://compliance:compliance@postgres:5432/intake
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REDIS_URL: redis://redis:6379/0
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
     ports:
       - "8000:8000"
     depends_on:
@@ -89,6 +89,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - kafka
+
 
 
 
