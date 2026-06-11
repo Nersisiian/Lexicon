@@ -63,3 +63,4 @@ services:
       - postgres
       - redis
       - minio
+
