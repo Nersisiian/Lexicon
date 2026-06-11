@@ -13,3 +13,4 @@ async def test_fraud_check():
     msg.value = b'{"completeness":{"score":0.9}}'
     await svc.process(msg)
     svc._kafka.publish.assert_called_once()
+

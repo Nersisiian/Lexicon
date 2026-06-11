@@ -7,3 +7,4 @@ _repo = ReviewRepository(str(settings.DATABASE_URL))
 def get_review_service():
     return ReviewService(_repo)
 
+

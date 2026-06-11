@@ -26,3 +26,4 @@ async def health():
     except Exception:
         db_ok = False
     return {"status": "ok", "database": db_ok}
+

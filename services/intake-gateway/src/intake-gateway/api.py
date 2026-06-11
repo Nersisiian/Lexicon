@@ -36,8 +36,9 @@ async def health():
         status_code=status_code,
     )
 
-# Deprecated v1 endpoint вЂ“ kept for backwards compatibility until all internal
+# Deprecated v1 endpoint РІР‚вЂњ kept for backwards compatibility until all internal
 # tools migrate to /v2. Remove after PLAT-3421.
 @router.post("/documents", deprecated=True)
 async def upload_v1(file: UploadFile = File(...)):
     raise HTTPException(410, detail="Use POST /v2/documents")
+

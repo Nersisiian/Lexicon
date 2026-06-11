@@ -12,3 +12,4 @@ class DocumentCreated(AggregateRoot):
     status: str = "received"
 
 
+

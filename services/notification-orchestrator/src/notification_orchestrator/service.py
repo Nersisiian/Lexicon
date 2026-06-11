@@ -1,8 +1,6 @@
-import json
 import httpx
 import structlog
 from compliance_sdk.kafka import ResilientConsumer, KafkaClient
-from compliance_sdk.observability.metrics import processing_duration
 from .config import settings
 
 logger = structlog.get_logger(__name__)
@@ -32,5 +30,6 @@ class NotificationService:
             return
         async with httpx.AsyncClient() as client:
             await client.post(settings.SLACK_WEBHOOK_URL, json={"text": text})
+
 
 

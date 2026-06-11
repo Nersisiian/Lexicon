@@ -12,3 +12,4 @@ app.include_router(router)
 @app.on_event("startup")
 async def startup():
     pass
+

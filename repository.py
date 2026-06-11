@@ -29,3 +29,4 @@ class DocumentRepository:
                 doc.status, doc.created_at, doc.updated_at,
             )
 
+

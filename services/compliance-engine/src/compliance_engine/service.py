@@ -56,3 +56,4 @@ class ComplianceService:
                 value=json.dumps(result).encode(),
             )
 
+

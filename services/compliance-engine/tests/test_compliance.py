@@ -13,3 +13,4 @@ async def test_evaluation():
     msg.value = b'{"label":"annual_report","entities":{"company_name":"ACME","revenue":"100"}}'
     await svc.process(msg)
     svc._kafka.publish.assert_called_once()
+

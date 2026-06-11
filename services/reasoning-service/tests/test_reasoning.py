@@ -13,3 +13,4 @@ async def test_reasoning():
     msg.value = b'{"doc_type":"annual_report","entities":{},"completeness":{},"fraud_flags":[]}'
     await svc.process(msg)
     svc._kafka.publish.assert_called_once()
+

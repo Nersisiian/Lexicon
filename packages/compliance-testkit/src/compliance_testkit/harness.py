@@ -19,3 +19,4 @@ async def redis():
     with RedisContainer() as r:
         yield f"redis://{r.get_container_host_ip()}:{r.get_exposed_port(6379)}"
 
+

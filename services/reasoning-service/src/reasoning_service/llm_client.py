@@ -1,5 +1,4 @@
 import structlog
-from .config import settings
 
 logger = structlog.get_logger(__name__)
 
@@ -11,5 +10,6 @@ class LLMClient:
         if "aml_kyc" in prompt:
             return "Medium risk: entity name matches sanction list."
         return "Insufficient data for assessment."
+
 
 

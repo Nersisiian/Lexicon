@@ -20,3 +20,4 @@ class SanctionsClient:
                 return len(data.get("matches", [])) > 0
         return False
 
+

@@ -6,3 +6,4 @@ _repo = AuditRepository(str(settings.DATABASE_URL))
 
 def get_audit_service():
     return AuditService(_repo)
+

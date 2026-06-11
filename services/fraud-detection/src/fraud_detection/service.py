@@ -34,3 +34,4 @@ class FraudDetectionService:
             value=json.dumps(result).encode(),
         )
 
+

@@ -37,3 +37,4 @@ class IntakeService:
             logger.info("document_ingested", doc_id=str(doc.id))
             return doc
 
+

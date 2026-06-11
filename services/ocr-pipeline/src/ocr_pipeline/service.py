@@ -46,3 +46,4 @@ class OCRPipelineService:
                 service="ocr-pipeline", document_type="unknown", status="ocr_completed"
             ).inc()
 
+

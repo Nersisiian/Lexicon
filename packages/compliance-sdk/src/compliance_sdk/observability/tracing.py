@@ -49,3 +49,4 @@ def inject_ctx_to_kafka(headers: dict, ctx: trace.Context) -> dict:
     _propagator.inject(headers, context=ctx)
     return headers
 
+

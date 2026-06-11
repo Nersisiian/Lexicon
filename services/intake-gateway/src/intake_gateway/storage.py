@@ -26,3 +26,4 @@ class MinioObjectStore(ObjectStore):
             self._bucket, key, BytesIO(data), len(data)
         )
 
+

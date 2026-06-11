@@ -11,3 +11,4 @@ class AuditEvent(BaseModel):
     user_id: str | None = None
     action: str = "record"
     payload: dict
+

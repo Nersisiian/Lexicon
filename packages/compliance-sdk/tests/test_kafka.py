@@ -10,3 +10,4 @@ async def test_publish():
         client._producer.send_and_wait = AsyncMock()
         await client.publish("test", "key", b"value")
         client._producer.send_and_wait.assert_called_once()
+

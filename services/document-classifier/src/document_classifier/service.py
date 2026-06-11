@@ -35,3 +35,4 @@ class ClassificationService:
                 key=doc_id,
                 value=str(result).encode(),
             )
+

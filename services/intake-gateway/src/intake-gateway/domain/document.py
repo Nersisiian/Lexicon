@@ -1,6 +1,5 @@
 from __future__ import annotations
-from uuid import UUID
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from compliance_sdk.domain.base import AggregateRoot
 
 class DocumentSubmission(BaseModel):
@@ -12,4 +11,5 @@ class DocumentSubmission(BaseModel):
 class DocumentCreated(AggregateRoot):
     submission: DocumentSubmission
     status: str = "received"
+
 

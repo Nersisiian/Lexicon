@@ -28,3 +28,4 @@ class DocumentRepository:
                 doc.submission.content_type, doc.submission.s3_key_raw,
                 doc.status, doc.created_at, doc.updated_at,
             )
+

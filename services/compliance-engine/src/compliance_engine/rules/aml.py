@@ -33,3 +33,4 @@ class AMLScorer:
                 self._open = True
                 circuit_breaker_state.labels(name="aml-sanctions").set(1)
             raise
+

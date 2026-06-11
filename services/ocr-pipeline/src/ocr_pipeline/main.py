@@ -16,7 +16,7 @@ loop.add_signal_handler(signal.SIGINT, _shutdown)
 
 import time
 import socket
-# Ждём, пока Kafka не станет доступна
+# Р–РґС‘Рј, РїРѕРєР° Kafka РЅРµ СЃС‚Р°РЅРµС‚ РґРѕСЃС‚СѓРїРЅР°
 for _ in range(30):
     try:
         s = socket.create_connection(("kafka", 9092), timeout=2)
@@ -57,7 +57,7 @@ async def main():
 
 if __name__ == "__main__":
     
-# Ждём, пока Kafka не станет доступна
+# Р–РґС‘Рј, РїРѕРєР° Kafka РЅРµ СЃС‚Р°РЅРµС‚ РґРѕСЃС‚СѓРїРЅР°
 import time, socket
 for _ in range(30):
     try:
@@ -67,6 +67,7 @@ for _ in range(30):
     except:
         time.sleep(1)
 asyncio.run(main())
+
 
 
 

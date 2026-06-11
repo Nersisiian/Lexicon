@@ -26,3 +26,4 @@ class AuditService:
 
     async def get(self, event_id) -> AuditEvent | None:
         return await self._repo.get_by_id(event_id)
+

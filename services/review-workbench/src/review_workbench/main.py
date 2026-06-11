@@ -8,3 +8,4 @@ init_tracing("review-workbench")
 
 app = FastAPI(title="Review Workbench")
 app.include_router(router)
+

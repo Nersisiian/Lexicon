@@ -10,3 +10,4 @@ async def test_record_event():
     event = await svc.record({"action": "test"})
     repo.save.assert_called_once()
     assert event.action == "test"
+

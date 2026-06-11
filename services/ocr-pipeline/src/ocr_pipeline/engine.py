@@ -17,9 +17,6 @@ async def extract_text_paddle(image_bytes: bytes) -> str:
     return "\n".join(texts)
 
 async def extract_text_legacy(image_bytes: bytes) -> str:
-    import pytesseract
-    from PIL import Image
-    import io
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(_legacy_executor, _tesseract_ocr, image_bytes)
 
@@ -38,5 +35,6 @@ async def extract_text(image_bytes: bytes) -> str:
             logger.warning("paddle_failed_falling_back_to_legacy")
             return await extract_text_legacy(image_bytes)
     return await extract_text_legacy(image_bytes)
+
 
 

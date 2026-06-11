@@ -22,3 +22,4 @@ class MinioObjectStore(ObjectStore):
         await loop.run_in_executor(
             None, self._client.put_object, self._bucket, key, data, len(data)
         )
+

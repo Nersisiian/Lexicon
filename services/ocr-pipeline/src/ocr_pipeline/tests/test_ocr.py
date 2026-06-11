@@ -13,3 +13,4 @@ async def test_process_message():
         service.consumer = AsyncMock()
         await service.process(msg)
         mock_ocr.assert_called_once()
+

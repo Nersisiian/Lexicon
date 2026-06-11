@@ -19,3 +19,4 @@ class DocumentClassifierModel:
         loop = asyncio.get_running_loop()
         result = await loop.run_in_executor(None, lambda: self._pipe(text[:512]))
         return {"label": result[0]["label"], "score": result[0]["score"]}
+

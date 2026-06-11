@@ -14,3 +14,4 @@ async def test_classify():
         msg.value = b"Annual financial statements..."
         await svc.process(msg)
         svc._model.classify.assert_called_once()
+
