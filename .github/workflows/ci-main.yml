@@ -92,11 +92,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Start PostgreSQL
         run: |
-          docker run -d --name postgres \
+          docker run -d --name postgres --network host \
             -e POSTGRES_USER=test \
             -e POSTGRES_PASSWORD=test \
             -e POSTGRES_DB=test \
-            -p 5432:5432 \
             postgres:16
           sleep 5
           docker exec postgres psql -U test -d test -c "
@@ -112,10 +111,9 @@ jobs:
             );"
       - name: Run intake-gateway
         run: |
-          docker run -d --name intake \
+          docker run -d --name intake --network host \
             -e KAFKA_BOOTSTRAP_SERVERS=localhost:9092 \
             -e DATABASE_URL=postgresql://test:test@localhost:5432/test \
-            -p 8000:8000 \
             ghcr.io/nersisiian/lexicon/intake-gateway:${{ github.sha }}
           for i in {1..30}; do
             if curl -s -f -o /dev/null http://localhost:8000/health; then
