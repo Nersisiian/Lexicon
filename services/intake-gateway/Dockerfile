@@ -1,3 +1,4 @@
+ARG CACHE_BUST=0
 FROM python:3.12-slim AS builder
 WORKDIR /app
 COPY packages/compliance-sdk /app/packages/compliance-sdk
@@ -25,3 +26,4 @@ CMD ["python", "-m", "uvicorn", "intake_gateway.main:app", "--host", "0.0.0.0", 
 # force rebuild 20260611191711
 
 # force rebuild 20260611193406
+

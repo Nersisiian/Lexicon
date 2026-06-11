@@ -36,6 +36,7 @@ jobs:
           context: .
           file: services/${{ matrix.service }}/Dockerfile
           push: true
+          no-cache: true
           tags: ${{ env.IMAGE_PATH }}/${{ matrix.service }}:${{ github.sha }}
 
   smoke-test:
@@ -125,3 +126,4 @@ jobs:
       - name: Cleanup
         if: always()
         run: docker compose -f deploy/docker-compose/docker-compose.test.yml down -v
+
