@@ -14,3 +14,5 @@ ENV PYTHONPATH=/app/services/compliance-engine/src
 WORKDIR /app/services/compliance-engine/src
 EXPOSE 8000
 CMD ["python", "-m", "src.compliance_engine.main"]
+
+# force rebuild 20260612003649

@@ -14,3 +14,5 @@ ENV PYTHONPATH=/app/services/fraud-detection/src
 WORKDIR /app/services/fraud-detection/src
 EXPOSE 8000
 CMD ["python", "-m", "src.fraud_detection.main"]
+
+# force rebuild 20260612003649

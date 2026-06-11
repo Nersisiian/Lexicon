@@ -14,3 +14,5 @@ ENV PYTHONPATH=/app/services/document-classifier/src
 WORKDIR /app/services/document-classifier/src
 EXPOSE 8000
 CMD ["python", "-m", "src.document_classifier.main"]
+
+# force rebuild 20260612003649

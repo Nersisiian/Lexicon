@@ -14,3 +14,5 @@ ENV PYTHONPATH=/app/services/reasoning-service/src
 WORKDIR /app/services/reasoning-service/src
 EXPOSE 8000
 CMD ["python", "-m", "src.reasoning_service.main"]
+
+# force rebuild 20260612003649

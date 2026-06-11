@@ -1,3 +1,6 @@
+"""Document classifier using HuggingFace transformers."""
+from __future__ import annotations
+import asyncio
 from transformers import pipeline
 import structlog
 from .config import settings
@@ -14,9 +17,8 @@ class DocumentClassifierModel:
         )
 
     async def classify(self, text: str) -> dict:
-        # HuggingFace pipeline is synchronous, wrap in executor
-        import asyncio
         loop = asyncio.get_running_loop()
-        result = await loop.run_in_executor(None, lambda: self._pipe(text[:512]))
+        result = await loop.run_in_executor(
+            None, lambda: self._pipe(text[:512])
+        )
         return {"label": result[0]["label"], "score": result[0]["score"]}
-
