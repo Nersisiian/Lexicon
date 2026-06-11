@@ -25,11 +25,12 @@ class DocumentRepository:
             await conn.execute(
                 "INSERT INTO documents (id, regulator_id, filename, content_type, s3_key_raw, status, created_at, updated_at) "
                 "VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-                doc.id, doc.submission.regulator_id, doc.submission.filename,
+                doc.id, doc.regulator_id, doc.submission.filename,
                 doc.submission.content_type, doc.submission.s3_key_raw,
                 doc.status,
                 doc.created_at.astimezone(timezone.utc),
                 doc.updated_at.astimezone(timezone.utc),
             )
+
 
 
