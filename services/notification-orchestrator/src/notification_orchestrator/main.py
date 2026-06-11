@@ -1,5 +1,18 @@
 import asyncio
 
+# Graceful shutdown
+import signal
+import asyncio
+
+_stop_event = asyncio.Event()
+
+def _shutdown():
+    _stop_event.set()
+
+loop = asyncio.get_running_loop()
+loop.add_signal_handler(signal.SIGTERM, _shutdown)
+loop.add_signal_handler(signal.SIGINT, _shutdown)
+
 import time
 import socket
 # ∆дЄм, пока Kafka не станет доступна
@@ -25,7 +38,8 @@ async def main():
     svc = NotificationService(kafka)
     await svc.consumer.start()
     try:
-        await svc.consumer.consume(svc.process)
+        while not _stop_event.is_set():
+            await svc.consumer.consume(svc.process)
     finally:
         await svc.consumer.stop()
         await kafka.stop()
@@ -42,4 +56,5 @@ for _ in range(30):
     except:
         time.sleep(1)
 asyncio.run(main())
+
 

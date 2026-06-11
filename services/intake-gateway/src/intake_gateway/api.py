@@ -4,14 +4,16 @@ Deprecated v1 endpoint remains for legacy internal tools; will be removed Q4 202
 """
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Response
 from .service import IntakeService
-from .deps import get_intake_service
+from .deps import get_intake_service, rate_limit
+from fastapi import Request
 
 router = APIRouter()
 
 @router.post("/v2/documents")
-async def upload_document(
-    file: UploadFile = File(...),
-    service: IntakeService = Depends(get_intake_service),
+async def upload_document(request: Request, file: UploadFile = File(...),
+    service: IntakeService = Depends(get_intake_service)
+    if not await rate_limit(request.client.host):
+        raise HTTPException(429, "Too many requests"),
 ):
     if not file.filename:
         raise HTTPException(400, "filename required")
@@ -28,3 +30,5 @@ async def health():
 @router.post("/documents", deprecated=True)
 async def upload_v1(file: UploadFile = File(...)):
     raise HTTPException(410, detail="Use POST /v2/documents")
+
+
