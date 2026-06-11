@@ -1,6 +1,6 @@
 import asyncpg
-from datetime import datetime, timezone
 import structlog
+from datetime import datetime, timezone
 from .domain.document import DocumentCreated
 
 logger = structlog.get_logger(__name__)
@@ -28,7 +28,6 @@ class DocumentRepository:
                 doc.id, doc.submission.regulator_id, doc.submission.filename,
                 doc.submission.content_type, doc.submission.s3_key_raw,
                 doc.status,
-                doc.created_at if doc.created_at else datetime.now(timezone.utc),
-                doc.updated_at if doc.updated_at else datetime.now(timezone.utc),
+                doc.created_at.astimezone(timezone.utc),
+                doc.updated_at.astimezone(timezone.utc),
             )
-
