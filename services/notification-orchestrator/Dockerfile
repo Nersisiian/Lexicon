@@ -14,3 +14,5 @@ ENV PYTHONPATH=/app/services/notification-orchestrator/src
 WORKDIR /app/services/notification-orchestrator/src
 EXPOSE 8000
 CMD ["python", "-m", "src.notification_orchestrator.main"]
+
+# force rebuild 20260612014321
