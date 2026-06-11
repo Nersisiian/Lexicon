@@ -1,7 +1,7 @@
 import json
 import structlog
 from compliance_sdk.kafka import ResilientConsumer, KafkaClient
-from compliance_sdk.observability.metrics import document_processed, processing_duration
+from compliance_sdk.observability.metrics import document_processed
 from opentelemetry import trace
 from .ensemble import FraudEnsemble
 from .config import settings
@@ -33,3 +33,4 @@ class FraudDetectionService:
             key=doc_id,
             value=json.dumps(result).encode(),
         )
+

@@ -1,4 +1,4 @@
-﻿from functools import lru_cache
+from functools import lru_cache
 from compliance_sdk.kafka import KafkaClient
 from .config import settings
 from .service import IntakeService
@@ -20,3 +20,4 @@ def get_intake_service() -> IntakeService:
     )
     kafka = get_kafka_client()
     return IntakeService(repo, store, kafka)
+

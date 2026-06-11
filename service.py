@@ -1,4 +1,4 @@
-﻿import structlog
+import structlog
 from opentelemetry import trace
 from compliance_sdk.kafka import KafkaClient
 from compliance_sdk.observability.metrics import document_processed
@@ -36,3 +36,4 @@ class IntakeService:
             ).inc()
             logger.info("document_ingested", doc_id=str(doc.id))
             return doc
+

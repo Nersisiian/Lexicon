@@ -32,3 +32,5 @@ class NotificationService:
             return
         async with httpx.AsyncClient() as client:
             await client.post(settings.SLACK_WEBHOOK_URL, json={"text": text})
+
+

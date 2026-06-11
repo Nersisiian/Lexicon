@@ -20,3 +20,4 @@ def get_intake_service() -> IntakeService:
     )
     kafka = get_kafka_client()
     return IntakeService(repo, store, kafka)
+

@@ -54,3 +54,4 @@ class ReasoningService:
                 key=doc_id,
                 value=json.dumps({"reasoning": "LLM unavailable"}).encode(),
             )
+

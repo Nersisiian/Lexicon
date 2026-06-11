@@ -34,3 +34,4 @@ class AuditRepository:
             if row:
                 return AuditEvent(**dict(row))
         return None
+

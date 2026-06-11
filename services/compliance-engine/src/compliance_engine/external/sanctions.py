@@ -19,3 +19,4 @@ class SanctionsClient:
                 data = resp.json()
                 return len(data.get("matches", [])) > 0
         return False
+

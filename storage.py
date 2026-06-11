@@ -1,4 +1,4 @@
-﻿from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod
 from minio import Minio
 import structlog
 
@@ -22,3 +22,4 @@ class MinioObjectStore(ObjectStore):
         await loop.run_in_executor(
             None, self._client.put_object, self._bucket, key, data, len(data)
         )
+

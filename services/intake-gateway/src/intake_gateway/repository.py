@@ -31,3 +31,4 @@ class DocumentRepository:
                 doc.created_at.astimezone(timezone.utc),
                 doc.updated_at.astimezone(timezone.utc),
             )
+

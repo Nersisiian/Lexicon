@@ -9,3 +9,4 @@ init_tracing("audit-ledger")
 
 app = FastAPI(title="Audit Ledger")
 app.include_router(router)
+

@@ -55,3 +55,4 @@ class ComplianceService:
                 key=doc_id,
                 value=json.dumps(result).encode(),
             )
+

@@ -11,3 +11,5 @@ class LLMClient:
         if "aml_kyc" in prompt:
             return "Medium risk: entity name matches sanction list."
         return "Insufficient data for assessment."
+
+

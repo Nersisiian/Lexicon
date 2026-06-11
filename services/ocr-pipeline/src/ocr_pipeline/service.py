@@ -45,3 +45,4 @@ class OCRPipelineService:
             document_processed.labels(
                 service="ocr-pipeline", document_type="unknown", status="ocr_completed"
             ).inc()
+

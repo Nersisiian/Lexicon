@@ -38,3 +38,5 @@ async def extract_text(image_bytes: bytes) -> str:
             logger.warning("paddle_failed_falling_back_to_legacy")
             return await extract_text_legacy(image_bytes)
     return await extract_text_legacy(image_bytes)
+
+

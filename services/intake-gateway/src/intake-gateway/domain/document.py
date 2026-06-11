@@ -12,3 +12,4 @@ class DocumentSubmission(BaseModel):
 class DocumentCreated(AggregateRoot):
     submission: DocumentSubmission
     status: str = "received"
+

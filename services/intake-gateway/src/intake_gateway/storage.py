@@ -25,3 +25,4 @@ class MinioObjectStore(ObjectStore):
             self._client.put_object,
             self._bucket, key, BytesIO(data), len(data)
         )
+

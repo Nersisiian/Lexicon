@@ -13,3 +13,4 @@ class DocumentCreated(AggregateRoot):
     """State after successful submission."""
     submission: DocumentSubmission
     status: str = "received"
+
