@@ -21,3 +21,9 @@ helm upgrade --install compliance deploy/helm/compliance-platform \
 kubectl port-forward svc/intake-gateway 8000:8000 -n compliance
 
 # Or create Ingress (see templates/ingress.yaml)
+
+## Automatic Deployment (CI/CD)
+1. Add your Kubernetes config as a GitHub Secret named `KUBE_CONFIG`:
+   ```bash
+   cat ~/.kube/config | base64 | gh secret set KUBE_CONFIG
+Push to main – the workflow will automatically deploy the latest images.

@@ -1,4 +1,5 @@
 global:
+  imageTag: stable
   environment: production
   imageRegistry: ghcr.io
   imageOwner: nersisiian
@@ -104,3 +105,4 @@ notification-orchestrator:
   tag: stable
   env:
     SLACK_WEBHOOK_URL: https://hooks.slack.com/services/...
+
