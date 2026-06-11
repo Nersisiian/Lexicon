@@ -27,6 +27,6 @@ class MinioObjectStore(ObjectStore):
         )
 
 class LocalObjectStore(ObjectStore):
-    """Test stub – does not persist data."""
+    """Test stub - does not persist data."""
     async def upload(self, key: str, data: bytes) -> None:
         logger.info("local_upload", key=key, size=len(data))
