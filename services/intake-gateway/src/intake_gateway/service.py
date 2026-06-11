@@ -5,6 +5,7 @@ from compliance_sdk.observability.metrics import document_processed
 from .domain.document import DocumentSubmission, DocumentCreated
 from .storage import ObjectStore
 from .repository import DocumentRepository
+from .config import settings
 
 logger = structlog.get_logger(__name__)
 tracer = trace.get_tracer(__name__)
@@ -18,7 +19,7 @@ class IntakeService:
     async def ingest(self, filename: str, content_type: str, content: bytes) -> DocumentCreated:
         with tracer.start_as_current_span("intake.ingest") as span:
             span.set_attribute("filename", filename)
-            s3_key = f"{self._repo.regulator_id}/{filename}"
+            s3_key = f"{settings.REGULATOR_ID}/{filename}"
             await self._storage.upload(s3_key, content)
             submission = DocumentSubmission(
                 filename=filename, content_type=content_type,
@@ -29,7 +30,7 @@ class IntakeService:
             # ѕубликаци€ в Kafka Ц опционально (может быть недоступна в тестах)
             try:
                 await self._kafka.publish(
-                    f"document.ingested.{settings.REGULATOR_ID}",
+                    "document.ingested",
                     key=str(doc.id),
                     value=doc.json().encode(),
                 )
@@ -38,6 +39,5 @@ class IntakeService:
             document_processed.labels(
                 service="intake-gateway", document_type="unknown", status="received"
             ).inc()
-            logger.info(f"document.ingested.{settings.REGULATOR_ID}", doc_id=str(doc.id))
+            logger.info("document_ingested", doc_id=str(doc.id))
             return doc
-
