@@ -14,7 +14,8 @@ async def extract_text_paddle(image_bytes: bytes) -> str:
     loop = asyncio.get_running_loop()
     result = await loop.run_in_executor(None, ocr.ocr, image_bytes)
     texts = [line[1][0] for line in result[0]] if result and result[0] else []
-    return "\n".join(texts)
+    return "
+".join(texts)
 
 async def extract_text_legacy(image_bytes: bytes) -> str:
     loop = asyncio.get_running_loop()

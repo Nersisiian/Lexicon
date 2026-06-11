@@ -1,6 +1,7 @@
 from __future__ import annotations
 from datetime import datetime, timezone
-from pydantic import BaseModel\nfrom compliance_sdk.domain.base import AggregateRoot
+from pydantic import BaseModel
+from compliance_sdk.domain.base import AggregateRoot
 
 class DocumentSubmission(BaseModel):
     filename: str
