@@ -3,7 +3,7 @@ from compliance_sdk.kafka import KafkaClient
 from .config import settings
 from .service import IntakeService
 from .repository import DocumentRepository
-from .storage import MinioObjectStore
+from .storage import MinioObjectStore, LocalObjectStore
 
 @lru_cache()
 def get_kafka_client() -> KafkaClient:
@@ -12,11 +12,14 @@ def get_kafka_client() -> KafkaClient:
 
 def get_intake_service() -> IntakeService:
     repo = DocumentRepository(str(settings.DATABASE_URL))
-    store = MinioObjectStore(
-        endpoint=settings.MINIO_ENDPOINT,
-        access_key=settings.MINIO_ACCESS_KEY,
-        secret_key=settings.MINIO_SECRET_KEY,
-        bucket=settings.RAW_BUCKET,
-    )
+    if settings.MINIO_ENDPOINT:
+        store = MinioObjectStore(
+            endpoint=settings.MINIO_ENDPOINT,
+            access_key=settings.MINIO_ACCESS_KEY,
+            secret_key=settings.MINIO_SECRET_KEY,
+            bucket=settings.RAW_BUCKET,
+        )
+    else:
+        store = LocalObjectStore()
     kafka = get_kafka_client()
     return IntakeService(repo, store, kafka)

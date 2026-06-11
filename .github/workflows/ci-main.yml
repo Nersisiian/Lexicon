@@ -63,8 +63,8 @@ jobs:
           docker run -d --name intake \
             -e KAFKA_BOOTSTRAP_SERVERS=localhost:9092 \
             -e DATABASE_URL=postgresql://test:test@localhost:5432/test \
-            -e MINIO_ACCESS_KEY=minio \
-            -e MINIO_SECRET_KEY=minio \
+            
+            
             -p 8000:8000 \
             ghcr.io/nersisiian/lexicon/intake-gateway:${{ github.sha }}
           for i in {1..30}; do
@@ -117,8 +117,8 @@ jobs:
           docker run -d --name intake \
             -e KAFKA_BOOTSTRAP_SERVERS=localhost:9092 \
             -e DATABASE_URL=postgresql://test:test@localhost:5432/test \
-            -e MINIO_ACCESS_KEY=minio \
-            -e MINIO_SECRET_KEY=minio \
+            
+            
             -p 8000:8000 \
             ghcr.io/nersisiian/lexicon/intake-gateway:${{ github.sha }}
           for i in {1..30}; do
@@ -159,3 +159,4 @@ jobs:
         run: |
           docker rm -f intake || true
           docker rm -f postgres || true
+

@@ -26,4 +26,7 @@ class MinioObjectStore(ObjectStore):
             self._bucket, key, BytesIO(data), len(data)
         )
 
-
+class LocalObjectStore(ObjectStore):
+    """Заглушка для тестов – никуда не сохраняет."""
+    async def upload(self, key: str, data: bytes) -> None:
+        logger.info("local_upload", key=key, size=len(data))
