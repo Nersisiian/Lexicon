@@ -17,8 +17,6 @@ kubectl create secret generic compliance-secrets \
 helm upgrade --install compliance deploy/helm/compliance-platform \
   -f deploy/helm/compliance-platform/values-production.yaml \
   --namespace compliance --create-namespace
-Access services
-bash
 # Port forward intake-gateway
 kubectl port-forward svc/intake-gateway 8000:8000 -n compliance
 

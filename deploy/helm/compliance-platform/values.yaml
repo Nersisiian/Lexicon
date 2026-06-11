@@ -63,7 +63,7 @@ compliance-engine:
   image: compliance-engine
   tag: latest
   env:
-    SANCTIONS_API_URL: http://sanctions-api:8080/search
+    SANCTIONS_API_URL: https://api.opensanctions.org
 
 fraud-detection:
   enabled: true
