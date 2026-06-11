@@ -23,7 +23,7 @@ class ReasoningService:
         self.consumer = ResilientConsumer(
             bootstrap_servers=kafka.bootstrap_servers,
             group_id="reasoning-v1",
-            topics=["document.fraud.checked"],
+            topics=[f"document.fraud.checked.{settings.REGULATOR_ID}"],
             dlq_topic="document.reasoning.dlq",
         )
         self._kafka = kafka
@@ -53,5 +53,6 @@ class ReasoningService:
                 key=doc_id,
                 value=json.dumps({"reasoning": "LLM unavailable"}).encode(),
             )
+
 
 

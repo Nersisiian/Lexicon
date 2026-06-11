@@ -13,7 +13,7 @@ class ClassificationService:
         self.consumer = ResilientConsumer(
             bootstrap_servers=kafka.bootstrap_servers,
             group_id="classifier-v1",
-            topics=["document.ocr.completed"],
+            topics=[f"document.ocr.completed.{settings.REGULATOR_ID}"],
             dlq_topic="document.classification.dlq",
         )
         self._kafka = kafka
@@ -35,4 +35,5 @@ class ClassificationService:
                 key=doc_id,
                 value=str(result).encode(),
             )
+
 

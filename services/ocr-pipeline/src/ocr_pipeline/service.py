@@ -13,7 +13,7 @@ class OCRPipelineService:
         self.consumer = ResilientConsumer(
             bootstrap_servers=kafka.bootstrap_servers,
             group_id="ocr-pipeline-v3",
-            topics=["document.ingested"],
+            topics=[f"document.ingested.{settings.REGULATOR_ID}"],
             dlq_topic="document.ocr.dlq",
             max_retries=2,
         )
@@ -45,5 +45,6 @@ class OCRPipelineService:
             document_processed.labels(
                 service="ocr-pipeline", document_type="unknown", status="ocr_completed"
             ).inc()
+
 
 

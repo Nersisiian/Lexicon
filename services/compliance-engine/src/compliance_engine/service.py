@@ -15,7 +15,7 @@ class ComplianceService:
         self.consumer = ResilientConsumer(
             bootstrap_servers=kafka.bootstrap_servers,
             group_id="compliance-engine-v1",
-            topics=["document.classified"],
+            topics=[f"document.classified.{settings.REGULATOR_ID}"],
             dlq_topic="document.compliance.dlq",
         )
         self._kafka = kafka
@@ -55,5 +55,6 @@ class ComplianceService:
                 key=doc_id,
                 value=json.dumps(result).encode(),
             )
+
 
 

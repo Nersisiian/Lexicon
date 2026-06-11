@@ -14,7 +14,7 @@ class FraudDetectionService:
         self.consumer = ResilientConsumer(
             bootstrap_servers=kafka.bootstrap_servers,
             group_id="fraud-detection-v1",
-            topics=["document.compliance.evaluated"],
+            topics=[f"document.compliance.evaluated.{settings.REGULATOR_ID}"],
             dlq_topic="document.fraud.dlq",
         )
         self._kafka = kafka
@@ -33,5 +33,6 @@ class FraudDetectionService:
             key=doc_id,
             value=json.dumps(result).encode(),
         )
+
 
 
