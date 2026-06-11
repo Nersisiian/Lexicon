@@ -31,3 +31,4 @@ class DocumentRepository:
                 doc.created_at if doc.created_at else datetime.now(timezone.utc),
                 doc.updated_at if doc.updated_at else datetime.now(timezone.utc),
             )
+
