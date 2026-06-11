@@ -9,7 +9,8 @@ RUN pip install poetry==1.8.5 && poetry config virtualenvs.create false && rm -f
 
 FROM python:3.12-slim
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
-COPY --from=builder /app /appENV PYTHONPATH=/app/services/review-workbench/src
+COPY --from=builder /app /app
+ENV PYTHONPATH=/app/services/review-workbench/src
 WORKDIR /app/services/review-workbench/src
 EXPOSE 8000
 CMD ["python", "-m", "uvicorn", "review_workbench.main:app", "--host", "0.0.0.0", "--port", "8000"]

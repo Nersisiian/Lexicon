@@ -9,6 +9,8 @@ RUN pip install poetry==1.8.5 && poetry config virtualenvs.create false && rm -f
 
 FROM python:3.12-slim
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
-COPY --from=builder /app /appWORKDIR /app/services/ocr-pipeline
+COPY --from=builder /app /app
+ENV PYTHONPATH=/app/services/ocr-pipeline/src
+WORKDIR /app/services/ocr-pipeline/src
 EXPOSE 8000
 CMD ["python", "-m", "src.ocr_pipeline.main"]
