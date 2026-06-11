@@ -1,4 +1,5 @@
 import asyncpg
+from datetime import datetime, timezone
 import structlog
 from .domain.document import DocumentCreated
 
@@ -26,5 +27,7 @@ class DocumentRepository:
                 "VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
                 doc.id, doc.submission.regulator_id, doc.submission.filename,
                 doc.submission.content_type, doc.submission.s3_key_raw,
-                doc.status, doc.created_at, doc.updated_at,
+                doc.status,
+                doc.created_at if doc.created_at else datetime.now(timezone.utc),
+                doc.updated_at if doc.updated_at else datetime.now(timezone.utc),
             )
