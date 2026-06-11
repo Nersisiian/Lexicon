@@ -62,7 +62,8 @@ jobs:
         run: |
           docker run -d --name intake \
             -e KAFKA_BOOTSTRAP_SERVERS=localhost:9092 \
-            -e DATABASE_URL=postgresql://test:test@localhost:5432/test -e REGULATOR_ID=test-regulator \\
+            -e DATABASE_URL=postgresql://test:test@localhost:5432/test \
+            -e REGULATOR_ID=test-regulator \
             -p 8000:8000 \
             ghcr.io/nersisiian/lexicon/intake-gateway:${{ github.sha }}
           for i in {1..30}; do
@@ -113,7 +114,8 @@ jobs:
         run: |
           docker run -d --name intake --network host \
             -e KAFKA_BOOTSTRAP_SERVERS=localhost:9092 \
-            -e DATABASE_URL=postgresql://test:test@localhost:5432/test -e REGULATOR_ID=test-regulator \\
+            -e DATABASE_URL=postgresql://test:test@localhost:5432/test \
+            -e REGULATOR_ID=test-regulator \
             ghcr.io/nersisiian/lexicon/intake-gateway:${{ github.sha }}
           for i in {1..30}; do
             if curl -s -f -o /dev/null http://localhost:8000/health; then
@@ -152,4 +154,3 @@ jobs:
         run: |
           docker rm -f intake || true
           docker rm -f postgres || true
-
