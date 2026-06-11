@@ -3,6 +3,7 @@ FROM python:3.12-slim AS builder
 WORKDIR /app
 ARG CACHE_BUST=0
 COPY packages/compliance-sdk /app/packages/compliance-sdk
+RUN echo "Cache bust: $CACHE_BUST"
 COPY services/intake-gateway /app/services/intake-gateway
 WORKDIR /app/services/intake-gateway
 RUN pip install poetry==1.8.5 && poetry config virtualenvs.create false && rm -f poetry.lock && poetry install --no-root
@@ -27,6 +28,7 @@ CMD ["python", "-m", "uvicorn", "intake_gateway.main:app", "--host", "0.0.0.0", 
 # force rebuild 20260611191711
 
 # force rebuild 20260611193406
+
 
 
 
