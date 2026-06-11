@@ -7,7 +7,7 @@ document_processed = Counter(
     ["service", "document_type", "status"], registry=REGISTRY
 )
 processing_duration = Histogram(
-    "document_processing_seconds", "PerР Р†Р вЂљРІР‚Вstage processing time",
+    "document_processing_seconds", "PerР В Р вЂ Р В РІР‚С™Р Р†Р вЂљР’Вstage processing time",
     ["service", "stage"], buckets=(0.5, 1, 5, 15, 30, 60, 120), registry=REGISTRY
 )
 consumer_lag = Gauge(

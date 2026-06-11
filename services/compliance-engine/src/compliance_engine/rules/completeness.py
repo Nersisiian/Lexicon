@@ -13,7 +13,7 @@ class CompletenessRule:
         score = 1.0 - (len(missing) / len(self.required)) if self.required else 1.0
         return {"score": score, "missing_fields": missing}
 
-# Registry mapping document type to rules. In production this would be DBР Р†Р вЂљРІР‚Вdriven.
+# Registry mapping document type to rules. In production this would be DBР В Р вЂ Р В РІР‚С™Р Р†Р вЂљР’Вdriven.
 RULES_REGISTRY = {
     "annual_report": CompletenessRule(["company_name", "fiscal_year", "revenue", "profit"]),
     "aml_kyc": CompletenessRule(["entity_name", "id_number", "address"]),
