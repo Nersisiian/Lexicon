@@ -65,8 +65,10 @@ class ResilientConsumer:
         await asyncio.gather(self._consumer.start(), self._producer.start())
 
     async def stop(self) -> None:
-        if self._consumer:\n            await self._consumer.stop()
-        if self._producer:\n            await self._producer.stop()
+        if self._consumer:
+            await self._consumer.stop()
+        if self._producer:
+            await self._producer.stop()
 
     async def consume(self, handler) -> None:
         async for msg in self._consumer:
@@ -97,7 +99,3 @@ class ResilientConsumer:
                         else:
                             await asyncio.sleep(2 ** retry_count)
             context.detach(token)
-
-
-
-

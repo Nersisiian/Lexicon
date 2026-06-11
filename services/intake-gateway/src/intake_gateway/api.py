@@ -31,7 +31,7 @@ async def health():
         kafka_ok = False
     return {"status": "ok" if kafka_ok else "degraded", "kafka": kafka_ok}
 
-# Deprecated v1 endpoint Р В Р вЂ Р В РІР‚С™Р Р†Р вЂљРЎС™ kept for backwards compatibility until all internal
+# Deprecated v1 endpoint Р В Р’В Р В РІР‚В Р В Р’В Р Р†Р вЂљРЎв„ўР В Р вЂ Р В РІР‚С™Р РЋРЎв„ў kept for backwards compatibility until all internal
 # tools migrate to /v2. Remove after PLAT-3421.
 @router.post("/documents", deprecated=True)
 async def upload_v1(file: UploadFile = File(...)):
