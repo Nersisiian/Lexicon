@@ -1,7 +1,7 @@
 CREATE DATABASE intake;
 CREATE DATABASE audit;
 CREATE DATABASE review;
-\c intake
+\c test
 CREATE TABLE IF NOT EXISTS documents (
     id UUID PRIMARY KEY,
     regulator_id TEXT NOT NULL,
