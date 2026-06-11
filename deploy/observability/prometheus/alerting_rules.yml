@@ -25,3 +25,12 @@ groups:
         annotations:
           summary: "Circuit breaker {{ $labels.name }} is open"
           description: "Circuit breaker has been open for more than 1 minute"
+
+      - alert: IntakeGatewayDown
+        expr: up{job="platform-services", service="intake-gateway"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Intake Gateway is down"
+          description: "The intake-gateway service has been unreachable for more than 1 minute."

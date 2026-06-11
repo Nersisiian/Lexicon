@@ -30,3 +30,12 @@ services:
       - "4318:4318"
       - "8889:8889"
     command: --config=/etc/otel/config.yaml
+
+  alertmanager:
+    image: prom/alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./observability/prometheus/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
