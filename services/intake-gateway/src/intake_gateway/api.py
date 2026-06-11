@@ -2,7 +2,7 @@
 
 Deprecated v1 endpoint remains for legacy internal tools; will be removed Q4 2025 (PLAT-3421).
 """
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
+from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Response
 from .service import IntakeService
 from .deps import get_intake_service
 
@@ -21,22 +21,10 @@ async def upload_document(
 
 @router.get("/health")
 async def health():
-    from aiokafka import AIOKafkaProducer
-    try:
-        producer = AIOKafkaProducer(bootstrap_servers="kafka:9092")
-        await producer.start()
-        await producer.stop()
-        kafka_ok = True
-    except Exception:
-        kafka_ok = False
-    return {"status": "ok" if kafka_ok else "degraded", "kafka": kafka_ok}
+    return {"status": "ok"}
 
-# Deprecated v1 endpoint Р В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В Р В Р’В Р вЂ™Р’В Р В Р вЂ Р В РІР‚С™Р вЂ™Р’В Р В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В Р В Р’В Р В РІР‚В Р В Р’В Р Р†Р вЂљРЎв„ўР В Р Р‹Р Р†РІР‚С›РЎС›Р В Р’В Р вЂ™Р’В Р В Р’В Р Р†Р вЂљР’В Р В Р’В Р вЂ™Р’В Р В Р вЂ Р В РІР‚С™Р РЋРІвЂћСћР В Р’В Р В Р вЂ№Р В Р Р‹Р Р†РІР‚С›РЎС› kept for backwards compatibility until all internal
+# Deprecated v1 endpoint � kept for backwards compatibility until all internal
 # tools migrate to /v2. Remove after PLAT-3421.
 @router.post("/documents", deprecated=True)
 async def upload_v1(file: UploadFile = File(...)):
     raise HTTPException(410, detail="Use POST /v2/documents")
-
-
-
-

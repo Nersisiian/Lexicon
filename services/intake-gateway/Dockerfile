@@ -14,3 +14,5 @@ ENV PYTHONPATH=/app/services/intake-gateway/src
 WORKDIR /app/services/intake-gateway/src
 EXPOSE 8000
 CMD ["python", "-m", "uvicorn", "intake_gateway.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# force rebuild 20260611222948
