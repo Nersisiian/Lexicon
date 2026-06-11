@@ -4,7 +4,7 @@ WORKDIR /app
 COPY packages/compliance-sdk /app/packages/compliance-sdk
 COPY services/fraud-detection /app/services/fraud-detection
 WORKDIR /app/services/fraud-detection
-RUN pip install poetry && poetry config virtualenvs.create false && rm -f poetry.lock && poetry install --no-root
+RUN pip install poetry==1.8.5 && poetry config virtualenvs.create false && rm -f poetry.lock && poetry install --no-root
 
 FROM python:3.12-slim
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
@@ -13,3 +13,6 @@ WORKDIR /app/services/fraud-detection
 EXPOSE 8000
 CMD ["python", "-m", "src.fraud_detection.main"]
 
+
+
+# force rebuild 20260611112308
