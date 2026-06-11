@@ -4,11 +4,10 @@ Deprecated v1 endpoint remains for legacy internal tools; will be removed Q4 202
 """
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Response
 from .service import IntakeService
-from .deps import get_intake_service, limiter
+from .deps import get_intake_service
 
 router = APIRouter()
 
-@limiter.limit("100/minute")
 @router.post("/v2/documents")
 async def upload_document(
     file: UploadFile = File(...),
@@ -29,5 +28,3 @@ async def health():
 @router.post("/documents", deprecated=True)
 async def upload_v1(file: UploadFile = File(...)):
     raise HTTPException(410, detail="Use POST /v2/documents")
-
-
