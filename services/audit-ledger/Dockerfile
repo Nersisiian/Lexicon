@@ -1,6 +1,8 @@
+ARG CACHE_BUST=0
 FROM python:3.12-slim AS builder
 WORKDIR /app
-COPY packages/compliance-sdk /app/packages/compliance-sdk
+COPY packages/compliance-sdk
+RUN echo "Cache bust: $CACHE_BUST" /app/packages/compliance-sdk
 COPY services/audit-ledger /app/services/audit-ledger
 # force rebuild 20260610191839
 WORKDIR /app/services/audit-ledger
@@ -15,3 +17,4 @@ CMD ["python", "-m", "uvicorn", "src.audit_ledger.main:app", "--host", "0.0.0.0"
 
 
 # force rebuild 20260611112308
+

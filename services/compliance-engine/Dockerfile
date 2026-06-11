@@ -1,7 +1,9 @@
+ARG CACHE_BUST=0
 FROM python:3.12-slim AS builder
 WORKDIR /app
 
-COPY packages/compliance-sdk /app/packages/compliance-sdk
+COPY packages/compliance-sdk
+RUN echo "Cache bust: $CACHE_BUST" /app/packages/compliance-sdk
 COPY services/compliance-engine /app/services/compliance-engine
 WORKDIR /app/services/compliance-engine
 RUN pip install poetry==1.8.5 && poetry config virtualenvs.create false && rm -f poetry.lock && poetry install --no-root
@@ -17,3 +19,4 @@ CMD ["python", "-m", "src.compliance_engine.main"]
 
 
 # force rebuild 20260611112308
+

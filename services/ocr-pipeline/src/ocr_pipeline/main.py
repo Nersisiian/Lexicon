@@ -16,7 +16,7 @@ loop.add_signal_handler(signal.SIGINT, _shutdown)
 
 import time
 import socket
-# Р–РґС‘Рј, РїРѕРєР° Kafka РЅРµ СЃС‚Р°РЅРµС‚ РґРѕСЃС‚СѓРїРЅР°
+# Р вЂ“Р Т‘РЎвЂР С, Р С—Р С•Р С”Р В° Kafka Р Р…Р Вµ РЎРѓРЎвЂљР В°Р Р…Р ВµРЎвЂљ Р Т‘Р С•РЎРѓРЎвЂљРЎС“Р С—Р Р…Р В°
 for _ in range(30):
     try:
         s = socket.create_connection(("kafka", 9092), timeout=2)
@@ -57,7 +57,7 @@ async def main():
 
 if __name__ == "__main__":
     
-# Р–РґС‘Рј, РїРѕРєР° Kafka РЅРµ СЃС‚Р°РЅРµС‚ РґРѕСЃС‚СѓРїРЅР°
+# Р вЂ“Р Т‘РЎвЂР С, Р С—Р С•Р С”Р В° Kafka Р Р…Р Вµ РЎРѓРЎвЂљР В°Р Р…Р ВµРЎвЂљ Р Т‘Р С•РЎРѓРЎвЂљРЎС“Р С—Р Р…Р В°
 import time, socket
 for _ in range(30):
     try:

@@ -11,7 +11,7 @@ aiokafka = "^0.14"
 compliance-sdk = { path = "../../packages/compliance-sdk" }
 paddleocr = "^2.7"
 opencv-python-headless = "^4.9"
-tenacity = "^8.2"
+tenacity = ">=9.1.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2"
@@ -20,5 +20,6 @@ pytest-asyncio = "^0.23"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
 
 
