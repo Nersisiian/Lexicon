@@ -1,6 +1,10 @@
 from functools import lru_cache
 from compliance_sdk.kafka import KafkaClient
 from .config import settings
+
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+limiter = Limiter(key_func=get_remote_address, storage_uri="memory://")
 from .service import IntakeService
 from .repository import DocumentRepository
 from .storage import MinioObjectStore
@@ -20,5 +24,6 @@ def get_intake_service() -> IntakeService:
     )
     kafka = get_kafka_client()
     return IntakeService(repo, store, kafka)
+
 
 
