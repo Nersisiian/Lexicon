@@ -82,21 +82,32 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Start test environment
+      - name: Start PostgreSQL
         run: |
-          export GITHUB_SHA=${{ github.sha }}
-          docker compose -f deploy/docker-compose/docker-compose.test.yml up -d
-      - name: Wait for Kafka
+          docker run -d --name postgres --network host \
+            -e POSTGRES_USER=test \
+            -e POSTGRES_PASSWORD=test \
+            -e POSTGRES_DB=test \
+            postgres:16
+          sleep 5
+          docker exec postgres psql -U test -d test -c "
+            CREATE TABLE IF NOT EXISTS documents (
+              id UUID PRIMARY KEY,
+              regulator_id TEXT NOT NULL,
+              filename TEXT NOT NULL,
+              content_type TEXT NOT NULL,
+              s3_key_raw TEXT NOT NULL,
+              status TEXT NOT NULL,
+              created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+              updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );"
+      - name: Run intake-gateway
         run: |
-          for i in {1..60}; do
-            if docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T kafka kafka-broker-api-versions --bootstrap-server localhost:9092 &>/dev/null; then
-              echo "Kafka ready"
-              break
-            fi
-            sleep 2
-          done
-      - name: Wait for intake-gateway healthcheck
-        run: |
+          docker run -d --name intake --network host \
+            -e KAFKA_BOOTSTRAP_SERVERS=localhost:9092 \
+            -e DATABASE_URL=postgresql://test:test@localhost:5432/test \
+            -e REGULATOR_ID=test-regulator \
+            ghcr.io/nersisiian/lexicon/intake-gateway:${{ github.sha }}
           for i in {1..30}; do
             if curl -s -f -o /dev/null http://localhost:8000/health; then
               echo "intake-gateway healthy"
@@ -104,22 +115,33 @@ jobs:
             fi
             sleep 2
           done
-      - name: Upload document and verify Kafka message
+      - name: Upload document and verify database
         run: |
           python3 -c "
           pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
           with open('/tmp/sample.pdf','wb') as f: f.write(pdf)
           "
-          RESP=$(curl -s -X POST http://localhost:8000/v2/documents \
+          RESP=$(curl -s -w '%{http_code}' -X POST http://localhost:8000/v2/documents \
             -F "file=@/tmp/sample.pdf;type=application/pdf")
-          echo "Response: $RESP"
-          DOC_ID=$(echo "$RESP" | jq -r '.document_id')
+          HTTP_CODE="${RESP: -3}"
+          BODY="${RESP%???}"
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response body: $BODY"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "Upload failed with code $HTTP_CODE"
+            docker logs intake
+            exit 1
+          fi
+          DOC_ID=$(echo "$BODY" | jq -r '.document_id')
           echo "Document ID: $DOC_ID"
-          sleep 10
-          docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T kafka \
-            kafka-console-consumer --topic document.ingested --bootstrap-server localhost:9092 \
-            --timeout-ms 15000 | grep "$DOC_ID"
+          COUNT=$(docker exec postgres psql -U test -d test -t -c "SELECT COUNT(*) FROM documents WHERE id='$DOC_ID'")
+          if [ "$COUNT" -eq 0 ]; then
+            echo "Document not found in database"
+            exit 1
+          fi
+          echo "Integration test passed: document $DOC_ID is in PostgreSQL"
       - name: Cleanup
         if: always()
-        run: docker compose -f deploy/docker-compose/docker-compose.test.yml down -v
-
+        run: |
+          docker rm -f intake || true
+          docker rm -f postgres || true
