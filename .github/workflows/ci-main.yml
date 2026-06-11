@@ -36,6 +36,8 @@ jobs:
           context: .
           file: services/${{ matrix.service }}/Dockerfile
           push: true
+          build-args: |
+            CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
           no-cache: true
           tags: ${{ env.IMAGE_PATH }}/${{ matrix.service }}:${{ github.sha }}
 
@@ -126,4 +128,5 @@ jobs:
       - name: Cleanup
         if: always()
         run: docker compose -f deploy/docker-compose/docker-compose.test.yml down -v
+
 
