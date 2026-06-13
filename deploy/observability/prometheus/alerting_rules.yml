@@ -25,12 +25,19 @@ groups:
         annotations:
           summary: "Circuit breaker {{ $labels.name }} is open"
           description: "Circuit breaker has been open for more than 1 minute"
-
-      - alert: IntakeGatewayDown
-        expr: up{job="platform-services", service="intake-gateway"} == 0
-        for: 1m
+      - alert: LowAutoApprovalRate
+        expr: rate(document_processed_total{status="passed"}[15m]) / rate(document_processed_total{status=~"passed|pending_review"}[15m]) < 0.5
+        for: 15m
         labels:
-          severity: critical
+          severity: warning
         annotations:
-          summary: "Intake Gateway is down"
-          description: "The intake-gateway service has been unreachable for more than 1 minute."
+          summary: "Auto-approval rate below 50%"
+          description: "The automatic approval rate has dropped below 50% in the last 15 minutes. Check compliance rules and document quality."
+      - alert: ReviewQueueGrowing
+        expr: rate(document_processed_total{status="pending_review"}[30m]) * 3600 > 20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Review queue growing"
+          description: "More than 20 documents per hour are being sent for manual review. Consider scaling the review team."

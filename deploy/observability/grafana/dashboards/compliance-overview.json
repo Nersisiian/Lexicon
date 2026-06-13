@@ -1,49 +1,117 @@
 {
-  "title": "Compliance Platform Overview",
-  "panels": [
-    {
-      "title": "Document Ingestion Rate",
-      "type": "graph",
-      "targets": [
-        {
-          "expr": "rate(document_processed_total{status='received'}[5m])",
-          "legendFormat": "received/sec"
-        }
-      ],
-      "gridPos": { "x": 0, "y": 0, "w": 8, "h": 8 }
-    },
-    {
-      "title": "Consumer Lag",
-      "type": "graph",
-      "targets": [
-        {
-          "expr": "kafka_consumer_lag_records",
-          "legendFormat": "{{ topic }} ({{ consumer_group }})"
-        }
-      ],
-      "gridPos": { "x": 8, "y": 0, "w": 8, "h": 8 }
-    },
-    {
-      "title": "Processing Duration (p99)",
-      "type": "graph",
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.99, sum(rate(document_processing_seconds_bucket[5m])) by (le, stage))",
-          "legendFormat": "{{ stage }} p99"
-        }
-      ],
-      "gridPos": { "x": 16, "y": 0, "w": 8, "h": 8 }
-    },
-    {
-      "title": "Circuit Breakers",
-      "type": "stat",
-      "targets": [
-        {
-          "expr": "circuit_breaker_state",
-          "legendFormat": "{{ name }}"
-        }
-      ],
-      "gridPos": { "x": 0, "y": 8, "w": 8, "h": 4 }
-    }
-  ]
+    "title":  "Compliance Platform Overview",
+    "panels":  [
+                   {
+                       "title":  "Document Ingestion Rate",
+                       "type":  "graph",
+                       "targets":  [
+                                       {
+                                           "expr":  "rate(document_processed_total{status=\u0027received\u0027}[5m])",
+                                           "legendFormat":  "received/sec"
+                                       }
+                                   ],
+                       "gridPos":  {
+                                       "x":  0,
+                                       "y":  0,
+                                       "w":  8,
+                                       "h":  8
+                                   }
+                   },
+                   {
+                       "title":  "Consumer Lag",
+                       "type":  "graph",
+                       "targets":  [
+                                       {
+                                           "expr":  "kafka_consumer_lag_records",
+                                           "legendFormat":  "{{ topic }} ({{ consumer_group }})"
+                                       }
+                                   ],
+                       "gridPos":  {
+                                       "x":  8,
+                                       "y":  0,
+                                       "w":  8,
+                                       "h":  8
+                                   }
+                   },
+                   {
+                       "title":  "Processing Duration (p99)",
+                       "type":  "graph",
+                       "targets":  [
+                                       {
+                                           "expr":  "histogram_quantile(0.99, sum(rate(document_processing_seconds_bucket[5m])) by (le, stage))",
+                                           "legendFormat":  "{{ stage }} p99"
+                                       }
+                                   ],
+                       "gridPos":  {
+                                       "x":  16,
+                                       "y":  0,
+                                       "w":  8,
+                                       "h":  8
+                                   }
+                   },
+                   {
+                       "title":  "Circuit Breakers",
+                       "type":  "stat",
+                       "targets":  [
+                                       {
+                                           "expr":  "circuit_breaker_state",
+                                           "legendFormat":  "{{ name }}"
+                                       }
+                                   ],
+                       "gridPos":  {
+                                       "x":  0,
+                                       "y":  8,
+                                       "w":  8,
+                                       "h":  4
+                                   }
+                   },
+                   {
+                       "title":  "Auto-Approval Rate",
+                       "type":  "stat",
+                       "targets":  [
+                                       {
+                                           "expr":  "sum(rate(document_processed_total{status=\u0027passed\u0027}[1h])) / sum(rate(document_processed_total{status=~\u0027passed|pending_review\u0027}[1h])) * 100",
+                                           "legendFormat":  "auto-approval %"
+                                       }
+                                   ],
+                       "gridPos":  {
+                                       "x":  0,
+                                       "y":  12,
+                                       "w":  6,
+                                       "h":  4
+                                   }
+                   },
+                   {
+                       "title":  "Review Queue (per hour)",
+                       "type":  "graph",
+                       "targets":  [
+                                       {
+                                           "expr":  "rate(document_processed_total{status=\u0027pending_review\u0027}[1h]) * 3600",
+                                           "legendFormat":  "docs/hour"
+                                       }
+                                   ],
+                       "gridPos":  {
+                                       "x":  6,
+                                       "y":  12,
+                                       "w":  9,
+                                       "h":  4
+                                   }
+                   },
+                   {
+                       "title":  "End-to-End Processing Time (p95)",
+                       "type":  "graph",
+                       "targets":  [
+                                       {
+                                           "expr":  "histogram_quantile(0.95, sum(rate(document_processing_seconds_bucket[5m])) by (le))",
+                                           "legendFormat":  "p95 seconds"
+                                       }
+                                   ],
+                       "gridPos":  {
+                                       "x":  15,
+                                       "y":  12,
+                                       "w":  9,
+                                       "h":  4
+                                   }
+                   }
+               ]
 }

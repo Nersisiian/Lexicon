@@ -21,3 +21,8 @@ circuit_breaker_state = Gauge(
 def metrics_endpoint():
     return generate_latest(REGISTRY)
 
+
+auto_approved = Counter(
+    "auto_approved_total", "Documents that passed automatically",
+    ["service", "document_type"], registry=REGISTRY
+)
