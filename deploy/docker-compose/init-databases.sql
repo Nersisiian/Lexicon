@@ -13,3 +13,8 @@ CREATE TABLE IF NOT EXISTS documents (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
+
+-- ¬ключаем RLS дл€ таблицы documents
+ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
+CREATE POLICY regulator_isolation ON documents
+    USING (regulator_id = current_setting('app.current_regulator_id', true));

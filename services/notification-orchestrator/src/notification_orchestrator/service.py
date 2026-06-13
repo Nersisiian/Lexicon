@@ -55,3 +55,4 @@ class NotificationService:
             if settings.SMTP_USER:
                 server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
             server.send_message(msg)
+

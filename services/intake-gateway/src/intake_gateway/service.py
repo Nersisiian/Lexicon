@@ -30,7 +30,7 @@ class IntakeService:
             # ѕубликаци€ в Kafka Ц опционально (может быть недоступна в тестах)
             try:
                 await self._kafka.publish(
-                    "document.ingested",
+                    f"document.ingested.{settings.REGULATOR_ID}",
                     key=str(doc.id),
                     value=doc.json().encode(),
                 )
@@ -39,5 +39,6 @@ class IntakeService:
             document_processed.labels(
                 service="intake-gateway", document_type="unknown", status="received"
             ).inc()
-            logger.info("document_ingested", doc_id=str(doc.id))
+            logger.info(f"document.ingested.{settings.REGULATOR_ID}", doc_id=str(doc.id))
             return doc
+
