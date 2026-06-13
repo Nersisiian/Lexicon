@@ -13,3 +13,4 @@ spec:
     - intake-gateway
     - intake-gateway.compliance.svc
     - intake-gateway.compliance.svc.cluster.local
+

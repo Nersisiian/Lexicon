@@ -41,3 +41,4 @@ groups:
         annotations:
           summary: "Review queue growing"
           description: "More than 20 documents per hour are being sent for manual review. Consider scaling the review team."
+

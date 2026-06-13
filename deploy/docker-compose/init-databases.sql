@@ -12,3 +12,4 @@ CREATE TABLE IF NOT EXISTS documents (
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+

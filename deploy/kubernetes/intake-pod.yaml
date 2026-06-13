@@ -22,3 +22,4 @@ spec:
           value: ""
         - name: REGULATOR_ID
           value: "test-regulator"
+

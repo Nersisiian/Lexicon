@@ -5,3 +5,4 @@ metadata:
   namespace: compliance
 spec:
   selfSigned: {}
+

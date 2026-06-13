@@ -6,3 +6,4 @@ receivers:
       - api_url: '${SLACK_WEBHOOK_URL:-https://hooks.slack.com/services/TEST/WEBHOOK}'
         channel: '#alerts'
         send_resolved: true
+
