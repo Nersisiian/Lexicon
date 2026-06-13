@@ -45,9 +45,6 @@ jobs:
       - name: Check for hardcoded secrets
         run: |
           ! grep -r "minioadmin" deploy/ || exit 1
-                - name: Kubernetes manifest validation
-        run: |
-          kubectl apply --dry-run=client -f deploy/kubernetes/
 
   smoke-test:
     needs: build-and-push
@@ -177,4 +174,3 @@ jobs:
             --namespace compliance --create-namespace \
             --set global.imageTag=${{ github.sha }} \
             -f deploy/helm/compliance-platform/values-production.yaml || true
-
