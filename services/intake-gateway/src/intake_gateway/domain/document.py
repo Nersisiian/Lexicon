@@ -1,5 +1,6 @@
 from __future__ import annotations
 from datetime import datetime, timezone
+from uuid import UUID
 from pydantic import BaseModel, Field
 from compliance_sdk.domain.base import AggregateRoot
 
@@ -12,11 +13,3 @@ class DocumentSubmission(BaseModel):
 class DocumentCreated(AggregateRoot):
     submission: DocumentSubmission
     status: str = "received"
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-
-
-
-
-
