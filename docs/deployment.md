@@ -27,3 +27,8 @@ kubectl port-forward svc/intake-gateway 8000:8000 -n compliance
    ```bash
    cat ~/.kube/config | base64 | gh secret set KUBE_CONFIG
 Push to main – the workflow will automatically deploy the latest images.
+
+## Webhook Notifications (Slack/Email)
+1. Create a Slack App and enable Incoming Webhooks.
+2. Copy the Webhook URL and set it as environment variable `SLACK_WEBHOOK_URL`.
+3. For email, configure `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` etc.

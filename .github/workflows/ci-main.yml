@@ -238,3 +238,4 @@ jobs:
             --namespace compliance --create-namespace \
             --set global.imageTag=${{ github.sha }} \
             -f deploy/helm/compliance-platform/values-production.yaml || true
+
