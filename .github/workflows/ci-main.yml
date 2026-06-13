@@ -37,7 +37,6 @@ jobs:
           file: services/${{ matrix.service }}/Dockerfile
           push: true
           no-cache: true
-          no-cache: true
           tags: ${{ env.IMAGE_PATH }}/${{ matrix.service }}:${{ github.sha }}
 
   smoke-test:
@@ -163,6 +162,18 @@ jobs:
         run: |
           export GITHUB_SHA=${{ github.sha }}
           docker compose -f deploy/docker-compose/docker-compose.test.yml up -d
+      - name: Wait for MinIO
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:9000/minio/health/live; then
+              echo "MinIO ready"
+              break
+            fi
+            sleep 2
+          done
+      - name: Verify MinIO bucket
+        run: |
+          docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T minio ls /data/raw-documents/ || true
       - name: Wait for Kafka
         run: |
           for i in {1..60}; do
@@ -200,14 +211,14 @@ jobs:
           fi
           DOC_ID=$(echo "$BODY" | jq -r '.document_id')
           echo "Document ID: $DOC_ID"
-          # Проверка Kafka
+          # РџСЂРѕРІРµСЂРєР° Kafka
           docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T kafka \
             kafka-console-consumer --topic document.ingested --bootstrap-server localhost:9092 \
             --timeout-ms 15000 | grep "$DOC_ID"
-          # Проверка MinIO (файл должен появиться в бакете)
+          # РџСЂРѕРІРµСЂРєР° MinIO
           docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T minio \
             ls /data/raw-documents/test-regulator/ | grep "sample.pdf"
-          # Проверка PostgreSQL
+          # РџСЂРѕРІРµСЂРєР° PostgreSQL
           COUNT=$(docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T postgres \
             psql -U test -d test -t -c "SELECT COUNT(*) FROM documents WHERE id='$DOC_ID'")
           if [ "$COUNT" -eq 0 ]; then
@@ -239,6 +250,3 @@ jobs:
             --namespace compliance --create-namespace \
             --set global.imageTag=${{ github.sha }} \
             -f deploy/helm/compliance-platform/values-production.yaml || true
-
-
-
