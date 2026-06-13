@@ -154,6 +154,69 @@ jobs:
           docker rm -f intake || true
           docker rm -f postgres || true
 
+  integration-test-full:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Start test environment
+        run: |
+          export GITHUB_SHA=${{ github.sha }}
+          docker compose -f deploy/docker-compose/docker-compose.test.yml up -d
+      - name: Wait for Kafka
+        run: |
+          for i in {1..60}; do
+            if docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T kafka kafka-broker-api-versions --bootstrap-server localhost:9092 &>/dev/null; then
+              echo "Kafka ready"
+              break
+            fi
+            sleep 2
+          done
+      - name: Wait for intake-gateway healthcheck
+        run: |
+          for i in {1..30}; do
+            if curl -s -f -o /dev/null http://localhost:8000/health; then
+              echo "intake-gateway healthy"
+              break
+            fi
+            sleep 2
+          done
+      - name: Upload document and verify Kafka + MinIO
+        run: |
+          python3 -c "
+          pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
+          with open('/tmp/sample.pdf','wb') as f: f.write(pdf)
+          "
+          RESP=$(curl -s -X POST http://localhost:8000/v2/documents \
+            -F "file=@/tmp/sample.pdf;type=application/pdf")
+          echo "Response: $RESP"
+          DOC_ID=$(echo "$RESP" | jq -r '.document_id')
+          echo "Document ID: $DOC_ID"
+          # Проверка Kafka
+          docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T kafka \
+            kafka-console-consumer --topic document.ingested --bootstrap-server localhost:9092 \
+            --timeout-ms 15000 | grep "$DOC_ID"
+          # Проверка MinIO (файл должен появиться в бакете)
+          docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T minio \
+            ls /data/raw-documents/test-regulator/ | grep "sample.pdf"
+          # Проверка PostgreSQL
+          COUNT=$(docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T postgres \
+            psql -U test -d test -t -c "SELECT COUNT(*) FROM documents WHERE id='$DOC_ID'")
+          if [ "$COUNT" -eq 0 ]; then
+            echo "Document not found in database"
+            exit 1
+          fi
+          echo "Full integration test passed"
+      - name: Cleanup
+        if: always()
+        run: docker compose -f deploy/docker-compose/docker-compose.test.yml down -v
+
   deploy:
     needs: [integration-test, smoke-test]
     if: success() && github.ref == 'refs/heads/main'
@@ -174,4 +237,3 @@ jobs:
             --namespace compliance --create-namespace \
             --set global.imageTag=${{ github.sha }} \
             -f deploy/helm/compliance-platform/values-production.yaml || true
-
