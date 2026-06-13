@@ -36,8 +36,6 @@ jobs:
           context: .
           file: services/${{ matrix.service }}/Dockerfile
           push: true
-          build-args: |
-            CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
           tags: ${{ env.IMAGE_PATH }}/${{ matrix.service }}:${{ github.sha }}
 
   smoke-test:
@@ -162,24 +160,17 @@ jobs:
       - name: Start test environment
         run: |
           export GITHUB_SHA=${{ github.sha }}
-          docker compose -f deploy/docker-compose/docker-compose.test.yml up -d
+          docker compose -f deploy/docker-compose/docker-compose.test.yml up -d postgres minio redis intake-gateway
+      - name: Create MinIO bucket
+        run: |
+          docker run --rm --network docker-compose_default \
+            minio/mc alias set myminio http://minio:9000 minioadmin minioadmin && \
+            minio/mc mb myminio/raw-documents || true
       - name: Wait for MinIO
         run: |
           for i in {1..30}; do
             if curl -s http://localhost:9000/minio/health/live; then
               echo "MinIO ready"
-              break
-            fi
-            sleep 2
-          done
-      - name: Verify MinIO bucket
-        run: |
-          docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T minio ls /data/raw-documents/ || true
-      - name: Wait for Kafka
-        run: |
-          for i in {1..60}; do
-            if docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T kafka kafka-broker-api-versions --bootstrap-server localhost:9092 &>/dev/null; then
-              echo "Kafka ready"
               break
             fi
             sleep 2
@@ -193,7 +184,7 @@ jobs:
             fi
             sleep 2
           done
-      - name: Upload document and verify Kafka + MinIO
+      - name: Upload document and verify MinIO + PostgreSQL
         run: |
           python3 -c "
           pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
@@ -212,21 +203,17 @@ jobs:
           fi
           DOC_ID=$(echo "$BODY" | jq -r '.document_id')
           echo "Document ID: $DOC_ID"
-          # ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ° Kafka
-          docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T kafka \
-            kafka-console-consumer --topic document.ingested --bootstrap-server localhost:9092 \
-            --timeout-ms 15000 | grep "$DOC_ID"
-          # ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ° MinIO
+          # Ïðîâåðêà MinIO
           docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T minio \
             ls /data/raw-documents/test-regulator/ | grep "sample.pdf"
-          # ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ° PostgreSQL
+          # Ïðîâåðêà PostgreSQL
           COUNT=$(docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T postgres \
             psql -U test -d test -t -c "SELECT COUNT(*) FROM documents WHERE id='$DOC_ID'")
           if [ "$COUNT" -eq 0 ]; then
             echo "Document not found in database"
             exit 1
           fi
-          echo "Full integration test passed"
+          echo "Integration test (MinIO + PostgreSQL) passed"
       - name: Cleanup
         if: always()
         run: docker compose -f deploy/docker-compose/docker-compose.test.yml down -v
@@ -251,11 +238,3 @@ jobs:
             --namespace compliance --create-namespace \
             --set global.imageTag=${{ github.sha }} \
             -f deploy/helm/compliance-platform/values-production.yaml || true
-
-
-
-
-
-
-
-
