@@ -100,8 +100,8 @@ jobs:
               content_type TEXT NOT NULL,
               s3_key_raw TEXT NOT NULL,
               status TEXT NOT NULL,
-              created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-              updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+              created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+              updated_at TIMESTAMP NOT NULL DEFAULT NOW()
             );"
       - name: Run intake-gateway
         run: |
@@ -251,5 +251,6 @@ jobs:
             --namespace compliance --create-namespace \
             --set global.imageTag=${{ github.sha }} \
             -f deploy/helm/compliance-platform/values-production.yaml || true
+
 
 
