@@ -32,3 +32,8 @@ Push to main – the workflow will automatically deploy the latest images.
 1. Create a Slack App and enable Incoming Webhooks.
 2. Copy the Webhook URL and set it as environment variable `SLACK_WEBHOOK_URL`.
 3. For email, configure `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` etc.
+
+## Webhook Notifications (Slack/Email)
+1. Create a Slack App and enable Incoming Webhooks.
+2. Copy the Webhook URL and set it as environment variable `SLACK_WEBHOOK_URL`.
+3. For email, configure `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` etc.

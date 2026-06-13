@@ -184,6 +184,23 @@ jobs:
             fi
             sleep 2
           done
+      - name: Test notification webhook
+        run: |
+          docker run -d --name mock-slack --network host python:3.12-slim python3 -c "
+          from http.server import HTTPServer, BaseHTTPRequestHandler
+          class Handler(BaseHTTPRequestHandler):
+              def do_POST(self):
+                  content_length = int(self.headers['Content-Length'])
+                  body = self.rfile.read(content_length)
+                  print(f'SLACK_MOCK: {body.decode()}')
+                  self.send_response(200)
+                  self.end_headers()
+          HTTPServer(('', 8080), Handler).serve_forever()
+          "
+          sleep 2
+          docker compose -f deploy/docker-compose/docker-compose.test.yml up -d --force-recreate notification-orchestrator
+          sleep 5
+          docker logs mock-slack | grep "SLACK_MOCK"
       - name: Upload document and verify MinIO + PostgreSQL
         run: |
           python3 -c "
@@ -203,10 +220,10 @@ jobs:
           fi
           DOC_ID=$(echo "$BODY" | jq -r '.document_id')
           echo "Document ID: $DOC_ID"
-          # Проверка MinIO
+          # РџСЂРѕРІРµСЂРєР° MinIO
           docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T minio \
             ls /data/raw-documents/test-regulator/ | grep "sample.pdf"
-          # Проверка PostgreSQL
+          # РџСЂРѕРІРµСЂРєР° PostgreSQL
           COUNT=$(docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T postgres \
             psql -U test -d test -t -c "SELECT COUNT(*) FROM documents WHERE id='$DOC_ID'")
           if [ "$COUNT" -eq 0 ]; then
@@ -238,4 +255,3 @@ jobs:
             --namespace compliance --create-namespace \
             --set global.imageTag=${{ github.sha }} \
             -f deploy/helm/compliance-platform/values-production.yaml || true
-
