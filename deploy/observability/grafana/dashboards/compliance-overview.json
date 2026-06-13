@@ -112,7 +112,40 @@
                                        "w":  9,
                                        "h":  4
                                    }
+                   },
+                   {
+                       "title":  "Application Logs",
+                       "type":  "logs",
+                       "datasource":  "Loki",
+                       "targets":  [
+                                       {
+                                           "expr":  "{job=\"intake-gateway\"} | json",
+                                           "legendFormat":  "intake-gateway logs"
+                                       }
+                                   ],
+                       "gridPos":  {
+                                       "x":  0,
+                                       "y":  16,
+                                       "w":  12,
+                                       "h":  8
+                                   }
+                   },
+                   {
+                       "title":  "Traces",
+                       "type":  "traces",
+                       "datasource":  "Tempo",
+                       "targets":  [
+                                       {
+                                           "query":  "{service.name=\"intake-gateway\"}",
+                                           "queryType":  "traceql"
+                                       }
+                                   ],
+                       "gridPos":  {
+                                       "x":  12,
+                                       "y":  16,
+                                       "w":  12,
+                                       "h":  8
+                                   }
                    }
                ]
 }
-
