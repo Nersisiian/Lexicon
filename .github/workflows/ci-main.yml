@@ -36,6 +36,7 @@ jobs:
           context: .
           file: services/${{ matrix.service }}/Dockerfile
           push: true
+          no-cache: true
           tags: ${{ env.IMAGE_PATH }}/${{ matrix.service }}:${{ github.sha }}
 
   smoke-test:
@@ -229,3 +230,5 @@ jobs:
             --namespace compliance --create-namespace \
             --set global.imageTag=${{ github.sha }} \
             -f deploy/helm/compliance-platform/values-production.yaml || true
+
+
