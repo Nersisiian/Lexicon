@@ -19,8 +19,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Set lowercase image path
         run: |
-          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          REPO=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+          OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')
+          REPO=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')
           echo "IMAGE_PATH=${REGISTRY}/${OWNER}/${REPO}" >> $GITHUB_ENV
         env:
           REGISTRY: ${{ env.REGISTRY }}
@@ -37,6 +37,21 @@ jobs:
           file: services/${{ matrix.service }}/Dockerfile
           push: true
           tags: ${{ env.IMAGE_PATH }}/${{ matrix.service }}:${{ github.sha }}
+
+  security-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for hardcoded secrets
+        run: |
+          ! grep -r "minioadmin" deploy/ || exit 1
+          ! grep -r "compliance" deploy/ || exit 1
+      - name: Kubernetes manifest validation
+        run: |
+          kubectl apply --dry-run=client -f deploy/kubernetes/
+      - name: Helm lint with security options
+        run: |
+          helm lint deploy/helm/compliance-platform --strict
 
   smoke-test:
     needs: build-and-push
@@ -166,4 +181,3 @@ jobs:
             --namespace compliance --create-namespace \
             --set global.imageTag=${{ github.sha }} \
             -f deploy/helm/compliance-platform/values-production.yaml || true
-

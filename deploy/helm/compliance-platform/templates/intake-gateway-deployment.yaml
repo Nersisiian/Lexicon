@@ -33,6 +33,9 @@ spec:
               value: {{ .Values.intake-gateway.minio.accessKey }}
             - name: MINIO_SECRET_KEY
               value: {{ .Values.intake-gateway.minio.secretKey }}
+          volumeMounts:
+            - name: tls-certs
+              mountPath: /etc/tls
           livenessProbe:
             httpGet:
               path: /health
@@ -41,4 +44,8 @@ spec:
             httpGet:
               path: /health
               port: 8000
+      volumes:
+        - name: tls-certs
+          secret:
+            secretName: intake-gateway-tls
 {{- end }}
