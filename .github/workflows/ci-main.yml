@@ -184,7 +184,7 @@ jobs:
             fi
             sleep 2
           done
-            - name: Test notification webhooks (Slack + Email)
+      - name: Test notification webhooks (Slack + Email)
         run: |
           # Mock Slack
           docker run -d --name mock-slack --network host python:3.12-slim python3 -c "
@@ -219,7 +219,8 @@ jobs:
           sleep 5
           docker logs mock-slack | grep "SLACK_MOCK" || true
           docker logs mock-smtp | grep "mail" || true
-          echo "Notification test completed"- name: Upload document and verify MinIO + PostgreSQL
+          echo "Notification test completed"
+      - name: Upload document and verify MinIO + PostgreSQL
         run: |
           python3 -c "
           pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
@@ -238,10 +239,10 @@ jobs:
           fi
           DOC_ID=$(echo "$BODY" | jq -r '.document_id')
           echo "Document ID: $DOC_ID"
-          # РџСЂРѕРІРµСЂРєР° MinIO
+          # Проверка MinIO
           docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T minio \
             ls /data/raw-documents/test-regulator/ | grep "sample.pdf"
-          # РџСЂРѕРІРµСЂРєР° PostgreSQL
+          # Проверка PostgreSQL
           COUNT=$(docker compose -f deploy/docker-compose/docker-compose.test.yml exec -T postgres \
             psql -U test -d test -t -c "SELECT COUNT(*) FROM documents WHERE id='$DOC_ID'")
           if [ "$COUNT" -eq 0 ]; then
