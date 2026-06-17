@@ -46,6 +46,19 @@ services:
       /usr/bin/mc mb myminio/raw-documents;
       exit 0;
       "
+  notification-orchestrator:
+    image: ghcr.io/nersisiian/lexicon/notification-orchestrator:${GITHUB_SHA:-latest}
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SLACK_WEBHOOK_URL: http://host.docker.internal:8080/slack
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_started
+    restart: unless-stopped
   intake-gateway:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:
