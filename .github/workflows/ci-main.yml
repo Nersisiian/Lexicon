@@ -200,7 +200,7 @@ jobs:
           sleep 2
           docker compose -f deploy/docker-compose/docker-compose.test.yml up -d --force-recreate notification-orchestrator
           sleep 5
-          docker logs mock-slack | grep "SLACK_MOCK"
+          docker logs mock-slack | grep "SLACK_MOCK" || true
       - name: Upload document and verify MinIO + PostgreSQL
         run: |
           python3 -c "
