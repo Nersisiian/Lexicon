@@ -5,7 +5,7 @@ Deprecated v1 endpoint remains for legacy internal tools; will be removed Q4 202
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Response
 from .service import IntakeService
 from .deps import get_intake_service
-from .main import DOCUMENTS_UPLOADED, PROCESSING_TIME
+from .metrics import DOCUMENTS_UPLOADED, PROCESSING_TIME
 
 router = APIRouter()
 
