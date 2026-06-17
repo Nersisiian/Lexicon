@@ -5,7 +5,6 @@ Deprecated v1 endpoint remains for legacy internal tools; will be removed Q4 202
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Response
 from .service import IntakeService
 from .deps import get_intake_service
-
 from .main import DOCUMENTS_UPLOADED, PROCESSING_TIME
 
 router = APIRouter()
@@ -15,7 +14,7 @@ async def upload_document(
     file: UploadFile = File(...),
     service: IntakeService = Depends(get_intake_service),
 ):
-        DOCUMENTS_UPLOADED.inc()
+    DOCUMENTS_UPLOADED.inc()
     with PROCESSING_TIME.time():
         if not file.filename:
             raise HTTPException(400, "filename required")
@@ -27,7 +26,7 @@ async def upload_document(
 async def health():
     return {"status": "ok"}
 
-# Deprecated v1 endpoint Р Р†Р вЂљРІР‚Сљ kept for backwards compatibility until all internal
+# Deprecated v1 endpoint – kept for backwards compatibility until all internal
 # tools migrate to /v2. Remove after PLAT-3421.
 @router.post("/documents", deprecated=True)
 async def upload_v1(file: UploadFile = File(...)):
