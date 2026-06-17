@@ -1,3 +1,6 @@
+from prometheus_client import Counter, Histogram, generate_latest
+from fastapi.responses import Response
+
 from fastapi import FastAPI
 from compliance_sdk.observability.logging import configure_logging
 from compliance_sdk.observability.tracing import init_tracing
