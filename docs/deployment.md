@@ -1,39 +1,56 @@
-# Kubernetes Deployment
+ï»¿# Production Deployment
 
 ## Prerequisites
-- Kubernetes cluster (minikube, kind, or cloud)
-- kubectl configured
-- Helm 3+
 
-## Deploy to cluster
+- Kubernetes cluster (v1.27+)
+- Helm v3.8+
+- kubectl configured with appropriate cluster context
+- GitHub Container Registry access (image pull secret)
+
+## Deploy
+
 ```bash
-# Add secrets (example)
-kubectl create secret generic compliance-secrets \
-  --from-literal=postgres-password=changeme \
-  --from-literal=minio-access-key=minioadmin \
-  --from-literal=minio-secret-key=minioadmin
+helm upgrade --install compliance deploy/helm/compliance-platform `
+  -f deploy/helm/compliance-platform/values-production.yaml `
+  --namespace compliance `
+  --create-namespace `
+  --set global.imageTag=<your-tag>
+````
 
-# Install chart
-helm upgrade --install compliance deploy/helm/compliance-platform \
-  -f deploy/helm/compliance-platform/values-production.yaml \
-  --namespace compliance --create-namespace
-# Port forward intake-gateway
-kubectl port-forward svc/intake-gateway 8000:8000 -n compliance
+## Verify
 
-# Or create Ingress (see templates/ingress.yaml)
+```bash
+kubectl get pods -n compliance
+kubectl logs -n compliance deployment/intake-gateway
+```
 
-## Automatic Deployment (CI/CD)
-1. Add your Kubernetes config as a GitHub Secret named `KUBE_CONFIG`:
-   ```bash
-   cat ~/.kube/config | base64 | gh secret set KUBE_CONFIG
-Push to main – the workflow will automatically deploy the latest images.
+## Monitoring
 
-## Webhook Notifications (Slack/Email)
-1. Create a Slack App and enable Incoming Webhooks.
-2. Copy the Webhook URL and set it as environment variable `SLACK_WEBHOOK_URL`.
-3. For email, configure `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` etc.
+### Grafana
 
-## Webhook Notifications (Slack/Email)
-1. Create a Slack App and enable Incoming Webhooks.
-2. Copy the Webhook URL and set it as environment variable `SLACK_WEBHOOK_URL`.
-3. For email, configure `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` etc.
+```text
+https://grafana.example.com/d/compliance-overview
+```
+
+### Metrics
+
+Prometheus targets are registered automatically via ServiceMonitor when Prometheus Operator is installed.
+
+### Alerts
+
+PagerDuty integration is configured through AlertManager.
+
+## Rolling Back
+
+List release revisions:
+
+```bash
+helm history compliance -n compliance
+```
+
+Rollback to a previous revision:
+
+```bash
+helm rollback compliance <REVISION> -n compliance
+```
+
