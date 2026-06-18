@@ -1,4 +1,4 @@
-# AI Document Compliance Platform
+# Lexicon — AI Document Compliance Platform
 
 **Internal platform for automated processing, validation, and human‑review of regulatory filings.**  
 Used by the financial regulator’s supervisory technology division.
@@ -9,24 +9,24 @@ Used by the financial regulator’s supervisory technology division.
 
 The platform ingests scanned and native‑electronic regulatory documents, extracts text and entities, classifies document types, validates completeness against jurisdictional rules, screens for fraud indicators, applies LLM‑based risk reasoning, and orchestrates human review workflows. Every action is recorded in an immutable audit ledger.
 
-The system is designed for **multi‑team ownership**, **independent deployability**, and **production observability** from day one.
+Designed for **multi‑team ownership**, **independent deployability**, and **production observability** from day one.
 
 ---
 
 ## Architecture at a Glance
 
-| Bounded Context          | Service                          | Interface  | State                |
-|--------------------------|----------------------------------|------------|----------------------|
-| Document Ingestion       | `intake‑gateway`                 | HTTP/FastAPI | PostgreSQL (own DB) |
-| OCR Extraction           | `ocr‑pipeline`                   | Kafka consumer | MinIO (raw + processed) |
-| Document Classification  | `document‑classifier`            | Kafka consumer | – |
-| Regulatory Evaluation    | `compliance‑engine`              | Kafka consumer | – |
-| Fraud Detection          | `fraud‑detection`                | Kafka consumer | – |
-| LLM Reasoning            | `reasoning‑service`              | Kafka consumer | – |
-| Immutable Audit Logging  | `audit‑ledger`                   | HTTP/Kafka | PostgreSQL (own DB) |
-| Human Review             | `review‑workbench`               | HTTP        | PostgreSQL (own DB) |
-| Notifications            | `notification‑orchestrator`      | Kafka consumer | – |
-| **Shared SDK**           | `compliance‑sdk`                 | Library     | – |
+| Bounded Context          | Service                          | Interface      | State                      |
+|--------------------------|----------------------------------|----------------|----------------------------|
+| Document Ingestion       | `intake‑gateway`                 | HTTP/FastAPI   | PostgreSQL (own DB)        |
+| OCR Extraction           | `ocr‑pipeline`                   | Kafka consumer | MinIO (raw + processed)    |
+| Document Classification  | `document‑classifier`            | Kafka consumer | –                          |
+| Regulatory Evaluation    | `compliance‑engine`              | Kafka consumer | –                          |
+| Fraud Detection          | `fraud‑detection`                | Kafka consumer | –                          |
+| LLM Reasoning            | `reasoning‑service`              | Kafka consumer | –                          |
+| Immutable Audit Logging  | `audit‑ledger`                   | HTTP/Kafka     | PostgreSQL (own DB)        |
+| Human Review             | `review‑workbench`               | HTTP           | PostgreSQL (own DB)        |
+| Notifications            | `notification‑orchestrator`      | Kafka consumer | –                          |
+| **Shared SDK**           | `compliance‑sdk`                 | Library        | –                          |
 
 All inter‑service communication goes through **Apache Kafka** (see [ADR‑001](docs/adr/001-kafka-over-rabbitmq.md)).  
 The platform uses **async Python** (FastAPI, aiokafka, asyncpg) and a hybrid model‑serving strategy (embedded + dedicated inference).
@@ -50,122 +50,423 @@ The platform uses **async Python** (FastAPI, aiokafka, asyncpg) and a hybrid mod
 └── Makefile # Top‑level build, test, lint, run commands
 
 
----
+# Quick Start (Local Development)
 
-## Quick Start (Local Development)
+## Prerequisites
 
-### Prerequisites
-- Docker Desktop 4.x+ (with Docker Compose v2)
-- Python 3.12 + Poetry (for running tests outside containers)
+* Docker Desktop 4.x+ (with Docker Compose v2)
+* Python 3.12 + Poetry (optional, for running tests outside containers)
 
-### 1. Clone and Bootstrap
+## 1. Clone and Bootstrap
 
 ```bash
 git clone https://github.com/Nersisiian/Lexicon.git
 cd Lexicon
-make run        # starts infrastructure + all services
 
-2. Verify
-bash
+# Start infrastructure and services
+docker compose -f deploy/docker-compose/docker-compose.test.yml up -d
+```
+
+## 2. Verify Installation
+
+Upload a sample document:
+
+```bash
 curl -X POST http://localhost:8000/v2/documents \
   -F "file=@sample.pdf"
-Open:
+```
 
-Intake Gateway → http://localhost:8000
-  
-Audit Ledger → http://localhost:8001
+### Available Services
 
-Review Workbench → http://localhost:8002
+| Service          | URL                   |
+| ---------------- | --------------------- |
+| Intake Gateway   | http://localhost:8000 |
+| Audit Ledger     | http://localhost:8001 |
+| Review Workbench | http://localhost:8002 |
+| MinIO Console    | http://localhost:9001 |
 
-MinIO Console → http://localhost:9001 (minioadmin / minioadmin
+**MinIO Credentials**
 
-3. Stop
-bash
-docker compose -f deploy/docker-compose/docker-compose.infra.yml -f deploy/docker-compose/docker-compose.services.yml down
-CI/CD
-GitHub Actions workflows are located in .github/workflows/.
+```text
+Username: minioadmin
+Password: minioadmin
+```
 
-Workflow	Trigger	Purpose
-ci-pr.yml	Pull Request → main	Lint (ruff), unit + integration tests
-ci-main.yml	Push to main	Build all Docker images, run security scan (Trivy)
-release-service.yml	Manual dispatch	Build and push a single service image to registry
-All workflows use the repository root as Docker build context and reference Dockerfiles via -f services/<name>/Dockerfile.
+## 3. Stop Environment
 
-Observability
-Every service is instrumented with OpenTelemetry (traces), Prometheus (metrics), and structlog (JSON logs). Correlation is done via W3C TraceContext propagated through Kafka headers.
+```bash
+docker compose -f deploy/docker-compose/docker-compose.test.yml down
+```
 
-Traces: exported to the OTel Collector → Jaeger (see deploy/observability/opentelemetry-collector-config.yaml)
+# API Documentation
 
-Metrics: exposed on /metrics on each HTTP service, scraped by Prometheus
+Interactive Swagger UI is available at:
 
-Dashboards: Grafana dashboard compliance-overview.json contains key panels: ingestion rate, consumer lag, processing duration histograms, circuit breaker state
+```text
+http://localhost:8000/docs
+```
 
-Alerts: defined in deploy/observability/prometheus/alerting_rules.yml (consumer lag > 5000, Redis memory pressure, OCR p99 latency > 45s)
+when the **intake-gateway** service is running.
 
-Key Design Decisions (ADRs)
-All significant architectural choices are documented as Architecture Decision Records:
+## Core Endpoints
 
-ADR‑001 – Why Kafka instead of RabbitMQ
+| Method | Endpoint        | Description                                          |
+| ------ | --------------- | ---------------------------------------------------- |
+| POST   | `/v2/documents` | Upload a document for processing (PDF/JPEG)          |
+| GET    | `/health`       | Service health check                                 |
+| GET    | `/metrics`      | Prometheus metrics endpoint                          |
+| GET    | `/export/csv`   | Export processed documents as CSV (review-workbench) |
 
-ADR‑002 – Why we avoided full event sourcing
+### Rate Limiting
 
-ADR‑003 – Why OCR is isolated from compliance evaluation
+Document ingestion is protected by rate limiting:
 
-ADR‑004 – Why PostgreSQL was chosen over MongoDB
+```text
+10 requests/minute per client (default)
+```
 
-ADR‑005 – Reasoning behind the async Python stack
+Implementation is based on **slowapi** middleware.
 
-ADR‑006 – Hybrid model serving strategy
+---
 
-ADR‑007 – Immutable audit trail requirements and implementation
+# CI/CD
 
-Incident Postmortems
-Real‑world operational learnings are captured in postmortems.
-Example: INC-2025-08-14 – OCR ingestion backlog and downstream pipeline stall (cascading failure due to vector‑heavy PDF batch, Redis retry amplification).
+GitHub Actions workflows are located in:
 
-Platform Conventions
-Bounded contexts: each service owns its data and public API; cross‑service joins are prohibited.
+```text
+.github/workflows/
+```
 
-Event schema evolution: Kafka messages carry a type header; consumers ignore unknown fields (forward‑compatible).
+| Workflow              | Trigger               | Purpose                                     |
+| --------------------- | --------------------- | ------------------------------------------- |
+| `ci-pr.yml`           | Pull Request → `main` | Ruff linting, unit tests, integration tests |
+| `ci-main.yml`         | Push → `main`         | Docker image build, Trivy security scan     |
+| `release-service.yml` | Manual Dispatch       | Build & publish a single service image      |
 
-Retries & DLQ: The ResilientConsumer in compliance‑sdk implements per‑message retry budget and dead‑letter routing after exhaustion.
+All workflows use the repository root as the Docker build context and reference Dockerfiles via:
 
-Idempotency: Consumers use document_id as a dedup key in Redis (TTL 90 days).
+```text
+services/<service-name>/Dockerfile
+```
 
-Configuration: 12‑factor app; environment variables defined in .env files, overridden by Helm values per environment.
+---
 
-Migrations: Each stateful service manages its own Alembic migrations; applied automatically in staging, manually approved in production.
+# Observability
 
-Contributing
-Create a feature branch from main.
+The platform is fully instrumented with:
 
-Implement changes, add/update tests.
+* OpenTelemetry (Distributed Tracing)
+* Prometheus (Metrics)
+* Grafana (Dashboards)
+* structlog (Structured JSON Logging)
 
-Run make lint and make test locally.
+Correlation is implemented through **W3C TraceContext** propagated via Kafka headers.
 
-Open a PR – CI will run linting, tests, and security scan.
+## Tracing
 
-At least one approving review from the owning team is required before merge.
+```text
+Service → OTel Collector → Jaeger
+```
 
-Team ownership is defined in CODEOWNERS.
+Configuration:
 
-Production Deployment
-Use the Helm chart:
+```text
+deploy/observability/opentelemetry-collector-config.yaml
+```
 
-bash
+## Metrics
+
+Every HTTP service exposes:
+
+```text
+/metrics
+```
+
+which is scraped by Prometheus.
+
+## Grafana Dashboards
+
+The dashboard `compliance-overview.json` includes:
+
+* Ingestion rate
+* Kafka consumer lag
+* Processing duration histograms
+* Circuit breaker state
+* Upload rate
+* Processing latency (p95)
+* Auto-approval rate
+* Manual review queue size
+
+## Alerting
+
+Prometheus alert rules are defined in:
+
+```text
+deploy/observability/prometheus/alerting_rules.yml
+```
+
+Example alerts:
+
+* Consumer lag > 5000
+* Redis memory pressure
+* OCR p99 latency > 45s
+
+---
+
+# A/B Testing
+
+Fraud detection supports production A/B testing.
+
+Metric:
+
+```text
+fraud_model_used_total
+```
+
+tracks model selection for every prediction.
+
+Dashboard:
+
+```text
+deploy/monitoring/grafana-fraud-ab.json
+```
+
+visualizes live traffic distribution between models.
+
+---
+
+# Architecture Decision Records (ADRs)
+
+Major architectural decisions are documented in ADRs:
+
+* ADR-001 — Kafka vs RabbitMQ
+* ADR-002 — Avoiding Full Event Sourcing
+* ADR-003 — OCR Isolation Strategy
+* ADR-004 — PostgreSQL vs MongoDB
+* ADR-005 — Async Python Stack
+* ADR-006 — Hybrid Model Serving
+* ADR-007 — Immutable Audit Trail
+
+---
+
+# Incident Postmortems
+
+Operational incidents and lessons learned are documented as postmortems.
+
+Example:
+
+```text
+INC-2025-08-14
+OCR ingestion backlog and downstream pipeline stall
+```
+
+Root cause:
+
+* Vector-heavy PDF batch
+* Redis retry amplification
+* Cascading consumer slowdown
+
+---
+
+# Platform Conventions
+
+## Service Ownership
+
+Each bounded context owns:
+
+* Its database
+* Its API
+* Its business logic
+
+Cross-service database joins are prohibited.
+
+## Event Schema Evolution
+
+Kafka messages include a type header.
+
+Consumers:
+
+* Ignore unknown fields
+* Remain forward compatible
+
+## Retries & Dead Letter Queues
+
+`ResilientConsumer` provides:
+
+* Retry budgets
+* Exponential backoff
+* Dead-letter routing
+
+## Idempotency
+
+Consumers use:
+
+```text
+document_id
+```
+
+as a Redis deduplication key.
+
+TTL:
+
+```text
+90 days
+```
+
+## Configuration
+
+The platform follows the 12-Factor App methodology.
+
+Configuration sources:
+
+1. `.env`
+2. Helm values
+3. Environment overrides
+
+## Database Migrations
+
+Each service owns its Alembic migrations.
+
+Policy:
+
+* Staging → automatic
+* Production → manual approval
+
+---
+
+# Notifications
+
+The `notification-orchestrator` sends status updates through:
+
+* Slack
+* Email
+
+Examples:
+
+* Manual review required
+* Approval completed
+* Processing failed
+
+Required environment variables:
+
+```text
+SLACK_WEBHOOK_URL
+
+SMTP_HOST
+SMTP_PORT
+SMTP_USER
+SMTP_PASSWORD
+SMTP_FROM
+SMTP_TO
+```
+
+Reference configuration:
+
+```text
+deploy/helm/compliance-platform/values-production.yaml
+```
+
+Integration tests use mock servers to validate both delivery channels.
+
+---
+
+# Autoscaling (HPA)
+
+The following services support Horizontal Pod Autoscaling:
+
+* OCR Pipeline
+* Document Classifier
+
+Default configuration:
+
+```text
+Min Replicas: 2
+Max Replicas: 10
+Target CPU: 70%
+```
+
+Configuration:
+
+```text
+deploy/helm/compliance-platform/values.yaml
+```
+
+# Contributing
+
+We welcome contributions that improve reliability, performance, security, and maintainability.
+
+## Development Workflow
+
+1. Create a feature branch from `main`.
+2. Implement your changes.
+3. Add or update tests where applicable.
+4. Run local validation checks:
+
+```bash
+make lint
+make test
+```
+
+5. Open a Pull Request targeting `main`.
+
+## Pull Request Requirements
+
+Before a PR can be merged:
+
+* All CI checks must pass
+* Linting must succeed
+* Unit and integration tests must pass
+* Security scans must report no blocking issues
+* At least one approval from the owning team is required
+
+Ownership rules are defined in:
+
+```text
+CODEOWNERS
+```
+
+---
+
+# Production Deployment
+
+Deploy the platform using the Helm chart:
+
+```bash
 helm upgrade --install compliance deploy/helm/compliance-platform \
   -f deploy/helm/compliance-platform/values-production.yaml \
-  --namespace compliance --create-namespace
-Refer to deploy/helm/compliance-platform/values.yaml for all configurable parameters.
+  --namespace compliance \
+  --create-namespace
+```
 
-Support & Operations
-Runbook: docs/runbooks/incident-response.md
+For all configurable parameters see:
 
-Dashboard: Grafana “Compliance Platform Overview”
+```text
+deploy/helm/compliance-platform/values.yaml
+```
 
-Alerting: PagerDuty integration via Prometheus AlertManager
+---
 
-Platform SRE Slack: #platform-sre
+# Support & Operations
 
-Maintained by the RegTech Platform Engineering division. Internal use only.
+## Operational Resources
 
+| Resource     | Description                            |
+| ------------ | -------------------------------------- |
+| Runbook      | `docs/runbooks/incident-response.md`   |
+| Dashboard    | Grafana – Compliance Platform Overview |
+| Alerting     | PagerDuty via Prometheus AlertManager  |
+| Team Channel | `#platform-sre`                        |
+
+## Incident Response
+
+Production incidents should be handled according to the documented runbooks and escalation procedures.
+
+Monitoring, alerting, and observability components are designed to provide complete operational visibility across the platform.
+
+---
+
+# Maintainers
+
+Maintained by the **RegTech Platform Engineering Division**.
+
+© 2026. Internal enterprise platform.
