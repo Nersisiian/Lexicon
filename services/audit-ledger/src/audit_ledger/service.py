@@ -1,9 +1,54 @@
 from datetime import datetime, timezone
+import logging.handlers
+
+siem_logger = logging.getLogger('siem')
+siem_logger.setLevel(logging.INFO)
+handler = logging.handlers.SysLogHandler(address=(settings.SIEM_SYSLOG_HOST, settings.SIEM_SYSLOG_PORT))
+siem_logger.addHandler(handler)
+
+def audit_event(event: dict):
+    siem_logger.info(str(event))
 from uuid import uuid4
 import structlog
+import logging.handlers
+
+siem_logger = logging.getLogger('siem')
+siem_logger.setLevel(logging.INFO)
+handler = logging.handlers.SysLogHandler(address=(settings.SIEM_SYSLOG_HOST, settings.SIEM_SYSLOG_PORT))
+siem_logger.addHandler(handler)
+
+def audit_event(event: dict):
+    siem_logger.info(str(event))
 from opentelemetry import trace
+import logging.handlers
+
+siem_logger = logging.getLogger('siem')
+siem_logger.setLevel(logging.INFO)
+handler = logging.handlers.SysLogHandler(address=(settings.SIEM_SYSLOG_HOST, settings.SIEM_SYSLOG_PORT))
+siem_logger.addHandler(handler)
+
+def audit_event(event: dict):
+    siem_logger.info(str(event))
 from .repository import AuditRepository
+import logging.handlers
+
+siem_logger = logging.getLogger('siem')
+siem_logger.setLevel(logging.INFO)
+handler = logging.handlers.SysLogHandler(address=(settings.SIEM_SYSLOG_HOST, settings.SIEM_SYSLOG_PORT))
+siem_logger.addHandler(handler)
+
+def audit_event(event: dict):
+    siem_logger.info(str(event))
 from .models import AuditEvent
+import logging.handlers
+
+siem_logger = logging.getLogger('siem')
+siem_logger.setLevel(logging.INFO)
+handler = logging.handlers.SysLogHandler(address=(settings.SIEM_SYSLOG_HOST, settings.SIEM_SYSLOG_PORT))
+siem_logger.addHandler(handler)
+
+def audit_event(event: dict):
+    siem_logger.info(str(event))
 
 logger = structlog.get_logger(__name__)
 

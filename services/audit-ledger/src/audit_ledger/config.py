@@ -16,3 +16,6 @@ settings = Settings()
 
 
 
+
+SIEM_SYSLOG_HOST: str = "siem.company.local"
+SIEM_SYSLOG_PORT: int = 514
