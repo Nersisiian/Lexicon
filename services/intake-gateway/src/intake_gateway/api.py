@@ -1,16 +1,12 @@
 """Public API for document ingestion.
-
-Deprecated v1 endpoint remains for legacy internal tools; will be removed Q4 2025 (PLAT-3421).
 """
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Response, Request
 from .service import IntakeService
 from .deps import get_intake_service
 from .metrics import DOCUMENTS_UPLOADED, PROCESSING_TIME
-from .limiter import limiter
 
 router = APIRouter()
 
-@limiter.limit("10/minute")
 @router.post("/v2/documents")
 async def upload_document(
     request: Request,
@@ -29,8 +25,6 @@ async def upload_document(
 async def health():
     return {"status": "ok"}
 
-# Deprecated v1 endpoint – kept for backwards compatibility until all internal
-# tools migrate to /v2. Remove after PLAT-3421.
 @router.post("/documents", deprecated=True)
 async def upload_v1(file: UploadFile = File(...)):
     raise HTTPException(410, detail="Use POST /v2/documents")
