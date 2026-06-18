@@ -8,7 +8,7 @@ class ABRouter:
         self.model_a = FraudEnsemble(settings.MODEL_PATH)
         self.model_b = None
         if settings.AB_ENABLE_MODEL_B:
-            self.model_b = FraudEnsemble("/models/fraud_model_b.pkl")  # ïóòü ê àëüòåðíàòèâíîé ìîäåëè
+            self.model_b = FraudEnsemble("/models/fraud_model_b.pkl")  # Ð¿ÑƒÑ‚ÑŒ Ðº Ð°Ð»ÑŒÑ‚ÐµÑ€Ð½Ð°Ñ‚Ð¸Ð²Ð½Ð¾Ð¹ Ð¼Ð¾Ð´ÐµÐ»Ð¸
         self.traffic_split = settings.AB_TRAFFIC_SPLIT
 
     def predict(self, features: Dict[str, Any]) -> Tuple[Dict[str, Any], str]:

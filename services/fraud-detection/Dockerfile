@@ -1,6 +1,7 @@
 ARG CACHE_BUST=0
 FROM python:3.12-slim AS builder
 WORKDIR /app
+COPY services/fraud-detection/models/ /models/
 COPY packages/compliance-sdk /app/packages/compliance-sdk
 RUN echo "Cache bust: $CACHE_BUST"
 COPY services/fraud-detection /app/services/fraud-detection

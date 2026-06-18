@@ -15,3 +15,5 @@ settings = Settings()
 
 
 
+
+MODEL_PATH: str = '/models/classifier_model.pkl'
