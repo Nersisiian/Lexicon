@@ -13,7 +13,8 @@ router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
 
 @limiter.limit("10/minute")
-@router.post("/v2/documents")
+@router.post("/v2/documents", summary="Upload a document for compliance processing",
+          description="Upload a PDF or image. The document goes through OCR, classification, compliance checks, and fraud detection.")
 async def upload_document(
     request: Request,
     file: UploadFile = File(...),
@@ -31,7 +32,7 @@ async def upload_document(
 async def health():
     return {"status": "ok"}
 
-# Deprecated v1 endpoint – kept for backwards compatibility until all internal
+# Deprecated v1 endpoint вЂ“ kept for backwards compatibility until all internal
 # tools migrate to /v2. Remove after PLAT-3421.
 @router.post("/documents", deprecated=True)
 async def upload_v1(file: UploadFile = File(...)):
