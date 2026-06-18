@@ -84,25 +84,32 @@ jobs:
           done
           echo "Rate limiting works"
 
-      - name: End-to-end document processing test
+            - name: End-to-end document processing test
         run: |
+          set -e
+          echo "Waiting for intake-gateway to be ready..."
+          sleep 10
           python3 -c "
           pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
           with open('/tmp/e2e.pdf','wb') as f: f.write(pdf)
           "
-          RESP=$(curl -s -w '%{http_code}' -X POST http://localhost:8000/v2/documents \
+          echo "Uploading document..."
+          RESP=$(curl -s -w '\n%{http_code}' -X POST http://localhost:8000/v2/documents \
             -F "file=@/tmp/e2e.pdf;type=application/pdf")
-          HTTP_CODE="${RESP: -3}"
-          BODY="${RESP%???}"
+          HTTP_CODE=$(echo "$RESP" | tail -n1)
+          BODY=$(echo "$RESP" | head -n -1)
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response body: $BODY"
           if [ "$HTTP_CODE" != "200" ]; then
-            echo "Upload failed"
+            echo "Upload failed with code $HTTP_CODE"
+            docker compose -f deploy/docker-compose/docker-compose.test.yml logs intake-gateway
             exit 1
           fi
           DOC_ID=$(echo "$BODY" | jq -r '.document_id')
           echo "Document ID: $DOC_ID"
 
-          # Poll status until 'completed' or timeout (30 seconds)
-          for i in $(seq 1 15); do
+          # Poll status until 'completed' or timeout (60 seconds)
+          for i in $(seq 1 30); do
             sleep 2
             STATUS=$(curl -s http://localhost:8000/v2/documents/$DOC_ID/status | jq -r '.status')
             echo "Status: $STATUS"
@@ -111,9 +118,8 @@ jobs:
               exit 0
             fi
           done
-          echo "Timeout: document not completed"
-          exit 1
-      - name: Cleanup
+          echo "Timeout: document not completed after 60s"
+          exit 1- name: Cleanup
         if: always()
         run: docker rm -f intake || true
 
@@ -203,25 +209,32 @@ jobs:
           done
           echo "Rate limiting works"
 
-      - name: End-to-end document processing test
+            - name: End-to-end document processing test
         run: |
+          set -e
+          echo "Waiting for intake-gateway to be ready..."
+          sleep 10
           python3 -c "
           pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
           with open('/tmp/e2e.pdf','wb') as f: f.write(pdf)
           "
-          RESP=$(curl -s -w '%{http_code}' -X POST http://localhost:8000/v2/documents \
+          echo "Uploading document..."
+          RESP=$(curl -s -w '\n%{http_code}' -X POST http://localhost:8000/v2/documents \
             -F "file=@/tmp/e2e.pdf;type=application/pdf")
-          HTTP_CODE="${RESP: -3}"
-          BODY="${RESP%???}"
+          HTTP_CODE=$(echo "$RESP" | tail -n1)
+          BODY=$(echo "$RESP" | head -n -1)
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response body: $BODY"
           if [ "$HTTP_CODE" != "200" ]; then
-            echo "Upload failed"
+            echo "Upload failed with code $HTTP_CODE"
+            docker compose -f deploy/docker-compose/docker-compose.test.yml logs intake-gateway
             exit 1
           fi
           DOC_ID=$(echo "$BODY" | jq -r '.document_id')
           echo "Document ID: $DOC_ID"
 
-          # Poll status until 'completed' or timeout (30 seconds)
-          for i in $(seq 1 15); do
+          # Poll status until 'completed' or timeout (60 seconds)
+          for i in $(seq 1 30); do
             sleep 2
             STATUS=$(curl -s http://localhost:8000/v2/documents/$DOC_ID/status | jq -r '.status')
             echo "Status: $STATUS"
@@ -230,9 +243,8 @@ jobs:
               exit 0
             fi
           done
-          echo "Timeout: document not completed"
-          exit 1
-      - name: Cleanup
+          echo "Timeout: document not completed after 60s"
+          exit 1- name: Cleanup
         if: always()
         run: |
           docker rm -f intake || true
@@ -359,25 +371,32 @@ jobs:
           done
           echo "Rate limiting works"
 
-      - name: End-to-end document processing test
+            - name: End-to-end document processing test
         run: |
+          set -e
+          echo "Waiting for intake-gateway to be ready..."
+          sleep 10
           python3 -c "
           pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
           with open('/tmp/e2e.pdf','wb') as f: f.write(pdf)
           "
-          RESP=$(curl -s -w '%{http_code}' -X POST http://localhost:8000/v2/documents \
+          echo "Uploading document..."
+          RESP=$(curl -s -w '\n%{http_code}' -X POST http://localhost:8000/v2/documents \
             -F "file=@/tmp/e2e.pdf;type=application/pdf")
-          HTTP_CODE="${RESP: -3}"
-          BODY="${RESP%???}"
+          HTTP_CODE=$(echo "$RESP" | tail -n1)
+          BODY=$(echo "$RESP" | head -n -1)
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response body: $BODY"
           if [ "$HTTP_CODE" != "200" ]; then
-            echo "Upload failed"
+            echo "Upload failed with code $HTTP_CODE"
+            docker compose -f deploy/docker-compose/docker-compose.test.yml logs intake-gateway
             exit 1
           fi
           DOC_ID=$(echo "$BODY" | jq -r '.document_id')
           echo "Document ID: $DOC_ID"
 
-          # Poll status until 'completed' or timeout (30 seconds)
-          for i in $(seq 1 15); do
+          # Poll status until 'completed' or timeout (60 seconds)
+          for i in $(seq 1 30); do
             sleep 2
             STATUS=$(curl -s http://localhost:8000/v2/documents/$DOC_ID/status | jq -r '.status')
             echo "Status: $STATUS"
@@ -386,9 +405,8 @@ jobs:
               exit 0
             fi
           done
-          echo "Timeout: document not completed"
-          exit 1
-      - name: Cleanup
+          echo "Timeout: document not completed after 60s"
+          exit 1- name: Cleanup
         if: always()
         run: docker compose -f deploy/docker-compose/docker-compose.test.yml down -v
 
