@@ -67,6 +67,18 @@ jobs:
           echo "ERROR: intake-gateway did not start"
           docker logs intake
           exit 1
+
+      - name: Test rate limiting
+        run: |
+          for i in $(seq 1 11); do
+            RESP=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:8000/v2/documents -F "file=@/tmp/sample.pdf;type=application/pdf")
+            echo "Request $i: $RESP"
+            if [ $i -gt 10 ] && [ "$RESP" != "429" ]; then
+              echo "Rate limiting not working, expected 429"
+              exit 1
+            fi
+          done
+          echo "Rate limiting works"
       - name: Cleanup
         if: always()
         run: docker rm -f intake || true
@@ -140,6 +152,18 @@ jobs:
             exit 1
           fi
           echo "Integration test passed: document $DOC_ID is in PostgreSQL"
+
+      - name: Test rate limiting
+        run: |
+          for i in $(seq 1 11); do
+            RESP=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:8000/v2/documents -F "file=@/tmp/sample.pdf;type=application/pdf")
+            echo "Request $i: $RESP"
+            if [ $i -gt 10 ] && [ "$RESP" != "429" ]; then
+              echo "Rate limiting not working, expected 429"
+              exit 1
+            fi
+          done
+          echo "Rate limiting works"
       - name: Cleanup
         if: always()
         run: |
@@ -250,6 +274,18 @@ jobs:
             exit 1
           fi
           echo "Integration test (MinIO + PostgreSQL) passed"
+
+      - name: Test rate limiting
+        run: |
+          for i in $(seq 1 11); do
+            RESP=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:8000/v2/documents -F "file=@/tmp/sample.pdf;type=application/pdf")
+            echo "Request $i: $RESP"
+            if [ $i -gt 10 ] && [ "$RESP" != "429" ]; then
+              echo "Rate limiting not working, expected 429"
+              exit 1
+            fi
+          done
+          echo "Rate limiting works"
       - name: Cleanup
         if: always()
         run: docker compose -f deploy/docker-compose/docker-compose.test.yml down -v
