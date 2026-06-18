@@ -6,7 +6,7 @@ from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Respons
 from .service import IntakeService
 from .deps import get_intake_service
 from .metrics import DOCUMENTS_UPLOADED, PROCESSING_TIME
-from .main import limiter
+from .limiter import limiter
 
 router = APIRouter()
 
@@ -30,7 +30,7 @@ async def upload_document(
 async def health():
     return {"status": "ok"}
 
-# Deprecated v1 endpoint РІР‚вЂњ kept for backwards compatibility until all internal
+# Deprecated v1 endpoint Р Р†Р вЂљРІР‚Сљ kept for backwards compatibility until all internal
 # tools migrate to /v2. Remove after PLAT-3421.
 @router.post("/documents", deprecated=True)
 async def upload_v1(file: UploadFile = File(...)):
