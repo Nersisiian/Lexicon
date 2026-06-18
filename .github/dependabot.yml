@@ -1,55 +1,56 @@
 version: 2
-updates:
-  - package-ecosystem: "pip"
+updates:  - package-ecosystem: "pip"
     directory: "/services/intake-gateway"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
-
-  - package-ecosystem: "pip"
+    allow:
+      - dependency-type: "all"
+    open-pull-requests-limit: 10   - package-ecosystem: "pip"
     directory: "/services/ocr-pipeline"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
-
-  - package-ecosystem: "pip"
+    allow:
+      - dependency-type: "all"
+    open-pull-requests-limit: 10   - package-ecosystem: "pip"
     directory: "/services/document-classifier"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
-
-  - package-ecosystem: "pip"
+    allow:
+      - dependency-type: "all"
+    open-pull-requests-limit: 10   - package-ecosystem: "pip"
     directory: "/services/compliance-engine"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
-
-  - package-ecosystem: "pip"
+    allow:
+      - dependency-type: "all"
+    open-pull-requests-limit: 10   - package-ecosystem: "pip"
     directory: "/services/fraud-detection"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
-
-  - package-ecosystem: "pip"
+    allow:
+      - dependency-type: "all"
+    open-pull-requests-limit: 10   - package-ecosystem: "pip"
     directory: "/services/reasoning-service"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
-
-  - package-ecosystem: "pip"
+    allow:
+      - dependency-type: "all"
+    open-pull-requests-limit: 10   - package-ecosystem: "pip"
     directory: "/services/audit-ledger"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
-
-  - package-ecosystem: "pip"
+    allow:
+      - dependency-type: "all"
+    open-pull-requests-limit: 10   - package-ecosystem: "pip"
     directory: "/services/review-workbench"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
-
-  - package-ecosystem: "pip"
+    allow:
+      - dependency-type: "all"
+    open-pull-requests-limit: 10   - package-ecosystem: "pip"
     directory: "/services/notification-orchestrator"
     schedule:
       interval: "weekly"
+    allow:
+      - dependency-type: "all"
     open-pull-requests-limit: 10
