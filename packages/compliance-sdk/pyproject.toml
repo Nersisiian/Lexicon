@@ -5,7 +5,7 @@ description = "Shared utilities for the compliance platform"
 authors = ["Platform Team <platform@regulator.internal>"]
 
 [tool.poetry.dependencies]
-pydantic-settings = "^2.0"
+pydantic-settings = "^2.14"
 python = "^3.12"
 aiokafka = ">=0.14.0"
 structlog = ">=26.1.0"
