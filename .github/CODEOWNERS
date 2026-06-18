@@ -1,7 +1,7 @@
-*       @platform-sre
-/services/intake-gateway/   @ingestion-team
-/services/ocr-pipeline/     @ocr-team
-/services/compliance-engine/ @compliance-team
-/services/audit-ledger/     @platform-sre @compliance-team
-/services/review-workbench/ @review-team
-/packages/compliance-sdk/   @platform-sre
+# *       @platform-sre
+# /services/intake-gateway/   @ingestion-team
+# /services/ocr-pipeline/     @ocr-team
+# /services/compliance-engine/ @compliance-team
+# /services/audit-ledger/     @platform-sre @compliance-team
+# /services/review-workbench/ @review-team
+# /packages/compliance-sdk/   @platform-sre
