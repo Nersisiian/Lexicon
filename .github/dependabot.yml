@@ -1,10 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: "pip"
-    directory: "/services/intake-gateway"
+    directory: "/"
     schedule:
       interval: "weekly"
-  - package-ecosystem: "pip"
-    directory: "/packages/compliance-sdk"
-    schedule:
-      interval: "weekly"
+    open-pull-requests-limit: 0
