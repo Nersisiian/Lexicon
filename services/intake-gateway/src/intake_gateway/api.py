@@ -2,7 +2,7 @@
 
 Deprecated v1 endpoint remains for legacy internal tools; will be removed Q4 2025 (PLAT-3421).
 """
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Response
+from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Response, Request
 from .service import IntakeService
 from .deps import get_intake_service
 from .metrics import DOCUMENTS_UPLOADED, PROCESSING_TIME
@@ -15,6 +15,7 @@ limiter = Limiter(key_func=get_remote_address)
 @limiter.limit("10/minute")
 @router.post("/v2/documents")
 async def upload_document(
+    request: Request,
     file: UploadFile = File(...),
     service: IntakeService = Depends(get_intake_service),
 ):
