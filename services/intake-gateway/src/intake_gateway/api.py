@@ -6,9 +6,13 @@ from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Respons
 from .service import IntakeService
 from .deps import get_intake_service
 from .metrics import DOCUMENTS_UPLOADED, PROCESSING_TIME
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
+@limiter.limit("10/minute")
 @router.post("/v2/documents")
 async def upload_document(
     file: UploadFile = File(...),
@@ -31,4 +35,3 @@ async def health():
 @router.post("/documents", deprecated=True)
 async def upload_v1(file: UploadFile = File(...)):
     raise HTTPException(410, detail="Use POST /v2/documents")
-
