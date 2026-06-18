@@ -67,59 +67,7 @@ jobs:
           echo "ERROR: intake-gateway did not start"
           docker logs intake
           exit 1
-
-      - name: Test rate limiting
-        run: |
-          python3 -c "
-          pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
-          with open('/tmp/sample.pdf','wb') as f: f.write(pdf)
-          "
-          for i in $(seq 1 11); do
-            RESP=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:8000/v2/documents -F "file=@/tmp/sample.pdf;type=application/pdf")
-            echo "Request $i: $RESP"
-            if [ $i -gt 10 ] && [ "$RESP" != "429" ]; then
-              echo "Rate limiting not working, expected 429"
-              exit 1
-            fi
-          done
-          echo "Rate limiting works"
-
-            - name: End-to-end document processing test
-        run: |
-          set -e
-          echo "Waiting for intake-gateway to be ready..."
-          sleep 10
-          python3 -c "
-          pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
-          with open('/tmp/e2e.pdf','wb') as f: f.write(pdf)
-          "
-          echo "Uploading document..."
-          RESP=$(curl -s -w '\n%{http_code}' -X POST http://localhost:8000/v2/documents \
-            -F "file=@/tmp/e2e.pdf;type=application/pdf")
-          HTTP_CODE=$(echo "$RESP" | tail -n1)
-          BODY=$(echo "$RESP" | head -n -1)
-          echo "HTTP status: $HTTP_CODE"
-          echo "Response body: $BODY"
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "Upload failed with code $HTTP_CODE"
-            docker compose -f deploy/docker-compose/docker-compose.test.yml logs intake-gateway
-            exit 1
-          fi
-          DOC_ID=$(echo "$BODY" | jq -r '.document_id')
-          echo "Document ID: $DOC_ID"
-
-          # Poll status until 'completed' or timeout (60 seconds)
-          for i in $(seq 1 30); do
-            sleep 2
-            STATUS=$(curl -s http://localhost:8000/v2/documents/$DOC_ID/status | jq -r '.status')
-            echo "Status: $STATUS"
-            if [ "$STATUS" = "completed" ]; then
-              echo "End-to-end test passed"
-              exit 0
-            fi
-          done
-          echo "Timeout: document not completed after 60s"
-          exit 1- name: Cleanup
+      - name: Cleanup
         if: always()
         run: docker rm -f intake || true
 
@@ -192,59 +140,7 @@ jobs:
             exit 1
           fi
           echo "Integration test passed: document $DOC_ID is in PostgreSQL"
-
-      - name: Test rate limiting
-        run: |
-          python3 -c "
-          pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
-          with open('/tmp/sample.pdf','wb') as f: f.write(pdf)
-          "
-          for i in $(seq 1 11); do
-            RESP=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:8000/v2/documents -F "file=@/tmp/sample.pdf;type=application/pdf")
-            echo "Request $i: $RESP"
-            if [ $i -gt 10 ] && [ "$RESP" != "429" ]; then
-              echo "Rate limiting not working, expected 429"
-              exit 1
-            fi
-          done
-          echo "Rate limiting works"
-
-            - name: End-to-end document processing test
-        run: |
-          set -e
-          echo "Waiting for intake-gateway to be ready..."
-          sleep 10
-          python3 -c "
-          pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
-          with open('/tmp/e2e.pdf','wb') as f: f.write(pdf)
-          "
-          echo "Uploading document..."
-          RESP=$(curl -s -w '\n%{http_code}' -X POST http://localhost:8000/v2/documents \
-            -F "file=@/tmp/e2e.pdf;type=application/pdf")
-          HTTP_CODE=$(echo "$RESP" | tail -n1)
-          BODY=$(echo "$RESP" | head -n -1)
-          echo "HTTP status: $HTTP_CODE"
-          echo "Response body: $BODY"
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "Upload failed with code $HTTP_CODE"
-            docker compose -f deploy/docker-compose/docker-compose.test.yml logs intake-gateway
-            exit 1
-          fi
-          DOC_ID=$(echo "$BODY" | jq -r '.document_id')
-          echo "Document ID: $DOC_ID"
-
-          # Poll status until 'completed' or timeout (60 seconds)
-          for i in $(seq 1 30); do
-            sleep 2
-            STATUS=$(curl -s http://localhost:8000/v2/documents/$DOC_ID/status | jq -r '.status')
-            echo "Status: $STATUS"
-            if [ "$STATUS" = "completed" ]; then
-              echo "End-to-end test passed"
-              exit 0
-            fi
-          done
-          echo "Timeout: document not completed after 60s"
-          exit 1- name: Cleanup
+      - name: Cleanup
         if: always()
         run: |
           docker rm -f intake || true
@@ -324,6 +220,21 @@ jobs:
           docker logs mock-slack | grep "SLACK_MOCK" || true
           docker logs mock-smtp | grep "mail" || true
           echo "Notification test completed"
+      - name: Test rate limiting
+        run: |
+          python3 -c "
+          pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
+          with open('/tmp/sample.pdf','wb') as f: f.write(pdf)
+          "
+          for i in $(seq 1 11); do
+            RESP=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:8000/v2/documents -F "file=@/tmp/sample.pdf;type=application/pdf")
+            echo "Request $i: $RESP"
+            if [ $i -gt 10 ] && [ "$RESP" != "429" ]; then
+              echo "Rate limiting not working, expected 429"
+              exit 1
+            fi
+          done
+          echo "Rate limiting works"
       - name: Upload document and verify MinIO + PostgreSQL
         run: |
           python3 -c "
@@ -354,26 +265,8 @@ jobs:
             exit 1
           fi
           echo "Integration test (MinIO + PostgreSQL) passed"
-
-      - name: Test rate limiting
+      - name: End-to-end document processing test
         run: |
-          python3 -c "
-          pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
-          with open('/tmp/sample.pdf','wb') as f: f.write(pdf)
-          "
-          for i in $(seq 1 11); do
-            RESP=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:8000/v2/documents -F "file=@/tmp/sample.pdf;type=application/pdf")
-            echo "Request $i: $RESP"
-            if [ $i -gt 10 ] && [ "$RESP" != "429" ]; then
-              echo "Rate limiting not working, expected 429"
-              exit 1
-            fi
-          done
-          echo "Rate limiting works"
-
-            - name: End-to-end document processing test
-        run: |
-          set -e
           echo "Waiting for intake-gateway to be ready..."
           sleep 10
           python3 -c "
@@ -394,8 +287,6 @@ jobs:
           fi
           DOC_ID=$(echo "$BODY" | jq -r '.document_id')
           echo "Document ID: $DOC_ID"
-
-          # Poll status until 'completed' or timeout (60 seconds)
           for i in $(seq 1 30); do
             sleep 2
             STATUS=$(curl -s http://localhost:8000/v2/documents/$DOC_ID/status | jq -r '.status')
@@ -406,7 +297,8 @@ jobs:
             fi
           done
           echo "Timeout: document not completed after 60s"
-          exit 1- name: Cleanup
+          exit 1
+      - name: Cleanup
         if: always()
         run: docker compose -f deploy/docker-compose/docker-compose.test.yml down -v
 
