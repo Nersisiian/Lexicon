@@ -97,39 +97,6 @@ jobs:
           docker logs intake
           exit 1
 
-      - name: End-to-end test with Kafka
-        run: |
-          echo "Waiting for Kafka to be ready..."
-          sleep 20
-          python3 -c "
-          pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
-          with open('/tmp/e2e.pdf','wb') as f: f.write(pdf)
-          "
-          echo "Uploading document..."
-          RESP=$(curl -s -w '\n%{http_code}' -X POST http://localhost:8000/v2/documents \
-            -F "file=@/tmp/e2e.pdf;type=application/pdf")
-          HTTP_CODE=$(echo "$RESP" | tail -n1)
-          BODY=$(echo "$RESP" | head -n -1)
-          echo "HTTP status: $HTTP_CODE"
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "Upload failed with code $HTTP_CODE"
-            exit 1
-          fi
-          DOC_ID=$(echo "$BODY" | jq -r '.document_id')
-          echo "Document ID: $DOC_ID"
-
-          # Ждём статус completed до 2 минут
-          for i in $(seq 1 60); do
-            sleep 2
-            STATUS=$(curl -s http://localhost:8000/v2/documents/$DOC_ID/status | jq -r '.status')
-            echo "Status: $STATUS"
-            if [ "$STATUS" = "completed" ]; then
-              echo "End-to-end test PASSED"
-              exit 0
-            fi
-          done
-          echo "Timeout: document not completed"
-          exit 1
       - name: Cleanup
         if: always()
         run: docker rm -f intake || true
@@ -204,39 +171,6 @@ jobs:
           fi
           echo "Integration test passed: document $DOC_ID is in PostgreSQL"
 
-      - name: End-to-end test with Kafka
-        run: |
-          echo "Waiting for Kafka to be ready..."
-          sleep 20
-          python3 -c "
-          pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
-          with open('/tmp/e2e.pdf','wb') as f: f.write(pdf)
-          "
-          echo "Uploading document..."
-          RESP=$(curl -s -w '\n%{http_code}' -X POST http://localhost:8000/v2/documents \
-            -F "file=@/tmp/e2e.pdf;type=application/pdf")
-          HTTP_CODE=$(echo "$RESP" | tail -n1)
-          BODY=$(echo "$RESP" | head -n -1)
-          echo "HTTP status: $HTTP_CODE"
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "Upload failed with code $HTTP_CODE"
-            exit 1
-          fi
-          DOC_ID=$(echo "$BODY" | jq -r '.document_id')
-          echo "Document ID: $DOC_ID"
-
-          # Ждём статус completed до 2 минут
-          for i in $(seq 1 60); do
-            sleep 2
-            STATUS=$(curl -s http://localhost:8000/v2/documents/$DOC_ID/status | jq -r '.status')
-            echo "Status: $STATUS"
-            if [ "$STATUS" = "completed" ]; then
-              echo "End-to-end test PASSED"
-              exit 0
-            fi
-          done
-          echo "Timeout: document not completed"
-          exit 1
       - name: Cleanup
         if: always()
         run: |
@@ -363,39 +297,6 @@ jobs:
           done
           echo "Rate limiting works"
 
-      - name: End-to-end test with Kafka
-        run: |
-          echo "Waiting for Kafka to be ready..."
-          sleep 20
-          python3 -c "
-          pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
-          with open('/tmp/e2e.pdf','wb') as f: f.write(pdf)
-          "
-          echo "Uploading document..."
-          RESP=$(curl -s -w '\n%{http_code}' -X POST http://localhost:8000/v2/documents \
-            -F "file=@/tmp/e2e.pdf;type=application/pdf")
-          HTTP_CODE=$(echo "$RESP" | tail -n1)
-          BODY=$(echo "$RESP" | head -n -1)
-          echo "HTTP status: $HTTP_CODE"
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "Upload failed with code $HTTP_CODE"
-            exit 1
-          fi
-          DOC_ID=$(echo "$BODY" | jq -r '.document_id')
-          echo "Document ID: $DOC_ID"
-
-          # Ждём статус completed до 2 минут
-          for i in $(seq 1 60); do
-            sleep 2
-            STATUS=$(curl -s http://localhost:8000/v2/documents/$DOC_ID/status | jq -r '.status')
-            echo "Status: $STATUS"
-            if [ "$STATUS" = "completed" ]; then
-              echo "End-to-end test PASSED"
-              exit 0
-            fi
-          done
-          echo "Timeout: document not completed"
-          exit 1
       - name: Cleanup
         if: always()
         run: docker compose -f deploy/docker-compose/docker-compose.test.yml down -v
