@@ -1,12 +1,13 @@
 from fastapi import Depends, HTTPException, Security
 from fastapi.security import OAuth2AuthorizationCodeBearer
 from keycloak import KeycloakOpenID
+import os
 
-# Конфигурация Keycloak (замени на свои значения)
-KEYCLOAK_SERVER_URL = "https://keycloak.example.com"
-KEYCLOAK_REALM = "lexicon"
-KEYCLOAK_CLIENT_ID = "intake-gateway"
-KEYCLOAK_CLIENT_SECRET = "ваш-client-secret"
+# Конфигурация Keycloak (замените на реальные значения через переменные окружения)
+KEYCLOAK_SERVER_URL = os.getenv("KEYCLOAK_SERVER_URL", "https://keycloak.example.com")
+KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM", "lexicon")
+KEYCLOAK_CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID", "intake-gateway")
+KEYCLOAK_CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET", "")
 
 keycloak_openid = KeycloakOpenID(
     server_url=KEYCLOAK_SERVER_URL,

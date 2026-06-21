@@ -5,7 +5,7 @@ description = "Document ingestion gateway"
 authors = ["Ingestion Team <ingestion@regulator.internal>"]
 
 [tool.poetry.dependencies]
-fastapi-oauth2 = "^0.4"
+python-keycloak = "^4.0"
 python = "^3.12"
 fastapi = "^0.111"
 uvicorn = "^0.29"
