@@ -1,8 +1,8 @@
 FROM node:18-alpine AS build
 WORKDIR /app
-COPY services/frontend/package.json services/frontend/package-lock.json* ./
+COPY package.json package-lock.json* ./
 RUN npm install
-COPY services/frontend .
+COPY . .
 RUN npm run build
 
 FROM nginx:alpine
