@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [frontend, intake-gateway, ocr-pipeline, document-classifier, compliance-engine, fraud-detection, reasoning-service, audit-ledger, review-workbench, notification-orchestrator]
+        service: [intake-gateway, ocr-pipeline, document-classifier, compliance-engine, fraud-detection, reasoning-service, audit-ledger, review-workbench, notification-orchestrator]
     permissions:
       contents: read
       packages: write
@@ -37,6 +37,35 @@ jobs:
           file: services/${{ matrix.service }}/Dockerfile
           push: true
           tags: ${{ env.IMAGE_PATH }}/${{ matrix.service }}:${{ github.sha }}
+
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set lowercase image path
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          REPO=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_PATH=${REGISTRY}/${OWNER}/${REPO}" >> $GITHUB_ENV
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push frontend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: services/frontend
+          file: services/frontend/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_PATH }}/frontend:${{ github.sha }}
 
   smoke-test:
     needs: build-and-push
