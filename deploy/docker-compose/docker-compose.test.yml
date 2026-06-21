@@ -76,3 +76,11 @@ services:
       - postgres
       - redis
       - minio
+  frontend:
+    build:
+      context: ../../services/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - intake-gateway
