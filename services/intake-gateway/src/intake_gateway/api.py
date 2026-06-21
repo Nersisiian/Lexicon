@@ -4,6 +4,7 @@ from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Respons
 from .service import IntakeService
 from .deps import get_intake_service
 from .metrics import DOCUMENTS_UPLOADED, PROCESSING_TIME
+from .auth.auth import get_current_user, require_role
 
 router = APIRouter()
 
@@ -21,6 +22,14 @@ async def upload_document(
         doc = await service.ingest(file.filename, file.content_type, content)
         return {"document_id": str(doc.id), "status": doc.status}
 
+
+@router.get("/secure/admin")
+async def admin_endpoint(user: dict = Depends(require_role("admin"))):
+    return {"message": f"Hello, admin {user['preferred_username']}"}
+
+@router.get("/secure/reviewer")
+async def reviewer_endpoint(user: dict = Depends(require_role("reviewer"))):
+    return {"message": f"Hello, reviewer {user['preferred_username']}"}
 @router.get("/health")
 async def health():
     return {"status": "ok"}
