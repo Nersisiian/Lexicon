@@ -1,45 +1,26 @@
 name: Chaos Test
 on:
-workflow_dispatch:
-inputs:
-experiment:
-description: 'Experiment file (e.g., pod-delete.yaml)'
-required: true
-default: 'pod-delete.yaml'
+  workflow_dispatch:
+    inputs:
+      experiment:
+        description: 'Experiment file (e.g., pod-delete.yaml)'
+        required: true
+        default: 'pod-delete.yaml'
 jobs:
-chaos:
-runs-on: ubuntu-latest
-steps:
-
-uses: actions/checkout@v4
-
-name: Configure kubectl
-run: |
-mkdir -p 
-H
-O
-M
-E
-/
-.
-k
-u
-b
-e
-e
-c
-h
-o
-"
-HOME/.kubeecho"{{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
-
-name: Install Litmus
-run: kubectl apply -f https://litmuschaos.github.io/litmus/litmus-operator-v3.0.0.yaml
-
-name: Run experiment
-run: kubectl apply -f chaos/experiments/${{ github.event.inputs.experiment }}
-
-name: Wait and verify
-run: |
-sleep 120
-echo "Check Grafana for impact"
+  chaos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+      - name: Install Litmus
+        run: kubectl apply -f https://litmuschaos.github.io/litmus/litmus-operator-v3.0.0.yaml
+      - name: Run experiment
+        run: |
+          kubectl apply -f chaos/experiments/${{ github.event.inputs.experiment }}
+      - name: Wait and verify
+        run: |
+          sleep 120
+          echo "Check Grafana for impact"
