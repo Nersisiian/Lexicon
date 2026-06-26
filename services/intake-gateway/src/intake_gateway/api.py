@@ -19,7 +19,7 @@ async def upload_document(
         if not file.filename:
             raise HTTPException(400, "filename required")
         content = await file.read()
-        doc = await service.ingest(file.filename, file.content_type, content)
+        tenant_id = request.headers.get("X-Tenant-ID", "default")`n        doc = await service.ingest(file.filename, file.content_type, content, tenant_id)
         return {"document_id": str(doc.id), "status": doc.status}
 
 

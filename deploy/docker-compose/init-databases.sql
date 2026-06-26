@@ -18,3 +18,6 @@ CREATE TABLE IF NOT EXISTS documents (
 ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
 CREATE POLICY regulator_isolation ON documents
     USING (regulator_id = current_setting('app.current_regulator_id', true));
+ALTER TABLE documents ADD COLUMN tenant_id TEXT NOT NULL DEFAULT 'default';
+ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON documents USING (tenant_id = current_setting('app.current_tenant')::TEXT);
