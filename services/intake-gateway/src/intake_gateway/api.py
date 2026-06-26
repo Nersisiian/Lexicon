@@ -19,8 +19,7 @@ async def upload_document(
         if not file.filename:
             raise HTTPException(400, "filename required")
         content = await file.read()
-        tenant_id = request.headers.get("X-Tenant-ID", "default")
-        doc = await service.ingest(file.filename, file.content_type, content, tenant_id)
+        doc = await service.ingest(file.filename, file.content_type, content)
         return {"document_id": str(doc.id), "status": doc.status}
 
 @router.get("/health")
@@ -37,7 +36,6 @@ async def reviewer_endpoint(user: dict = Depends(require_role("reviewer"))):
 
 @router.get("/v2/documents/{doc_id}/explain")
 async def explain_document(doc_id: str, request: Request):
-    # В реальном проекте здесь будет запрос к fraud-detection
     return {"document_id": doc_id, "explanation": "SHAP values would be here"}
 
 @router.post("/documents", deprecated=True)
