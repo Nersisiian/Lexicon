@@ -27,7 +27,7 @@ class IntakeService:
             )
             doc = DocumentCreated(submission=submission)
             await self._repo.save(doc)
-            # Публикация в Kafka – опционально (может быть недоступна в тестах)
+            # РџСѓР±Р»РёРєР°С†РёСЏ РІ Kafka вЂ“ РѕРїС†РёРѕРЅР°Р»СЊРЅРѕ (РјРѕР¶РµС‚ Р±С‹С‚СЊ РЅРµРґРѕСЃС‚СѓРїРЅР° РІ С‚РµСЃС‚Р°С…)
             try:
                 await self._kafka.publish(
                     f"document.ingested.{settings.REGULATOR_ID}",
