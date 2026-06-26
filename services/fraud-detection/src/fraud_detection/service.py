@@ -1,3 +1,4 @@
+import mlflow
 import json
 import structlog
 from compliance_sdk.kafka import ResilientConsumer, KafkaClient
@@ -22,12 +23,23 @@ class FraudDetectionService:
             dlq_topic="document.fraud.dlq",
         )
         self._kafka = kafka
+        # Загружаем модель из MLflow Model Registry, если URI задан. Иначе локально.
+        mlflow.set_tracking_uri(settings.MLFLOW_TRACKING_URI or "http://localhost:5000")
+        try:
+            model_uri = f"models:/{settings.MLFLOW_MODEL_NAME}/production"
+            self._model = mlflow.pyfunc.load_model(model_uri)
+        except:
+            self._model = FraudEnsemble(settings.MODEL_PATH)
         self._router = ABRouter()
 
     async def process(self, msg) -> None:
         doc_id = msg.key.decode()
         data = json.loads(msg.value)
-        result, model_name = self._router.predict(data)
+        mlflow.set_experiment('fraud-assessment')
+        with mlflow.start_run():
+            result, model_name = self._router.predict(data)
+            mlflow.log_metric('probability', result['probability'])
+            mlflow.log_param('model', model_name)
         logger.info("fraud_assessment", doc_id=doc_id, prob=result["probability"], model=model_name)
         MODEL_USED.labels(model=model_name).inc()
         document_processed.labels(

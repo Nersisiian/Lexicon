@@ -5,6 +5,8 @@ description = "Fraud detection ensemble service"
 authors = ["ML Team <ml@regulator.internal>"]
 
 [tool.poetry.dependencies]
+bentoml = "^1.0"
+mlflow = "^2.8"
 pydantic-settings = "^2.0"
 python = "^3.12"
 scikit-learn = "^1.4"

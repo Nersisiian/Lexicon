@@ -107,3 +107,8 @@ notification-orchestrator:
     SLACK_WEBHOOK_URL: https://hooks.slack.com/services/...
 
 
+
+fraud-detection:
+  env:
+    MLFLOW_TRACKING_URI: "http://mlflow:5000"
+    MLFLOW_MODEL_NAME: "fraud_ensemble"
