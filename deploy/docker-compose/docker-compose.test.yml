@@ -66,6 +66,17 @@ services:
       sh -c "pip install mlflow && mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:///mlflow.db"
     ports:
       - "5000:5000"
+
+  analytics-engine:
+    build:
+      context: ../../services/analytics-engine
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8003"
+    environment:
+      DATABASE_URL: postgresql://test:test@postgres:5432/test
+    depends_on:
+      - postgres
   intake-gateway:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:
