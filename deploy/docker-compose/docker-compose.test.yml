@@ -77,6 +77,13 @@ services:
       DATABASE_URL: postgresql://test:test@postgres:5432/test
     depends_on:
       - postgres
+
+  external-gateway:
+    build:
+      context: ../../services/external-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8004:8004"
   intake-gateway:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:
