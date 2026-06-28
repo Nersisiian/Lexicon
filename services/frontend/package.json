@@ -14,7 +14,8 @@
                          "axios":  "^1.6.0",
                          "i18next":  "^23.0",
                          "react-i18next":  "^13.0",
-                         "i18next-http-backend":  "^2.0"
+                         "i18next-http-backend":  "^2.0",
+                         "i18next-browser-languagedetector":  "^7.0"
                      },
     "devDependencies":  {
                             "@types/react":  "^18.2.0",
