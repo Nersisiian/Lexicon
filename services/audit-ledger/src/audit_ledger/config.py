@@ -19,3 +19,5 @@ settings = Settings()
 
 SIEM_SYSLOG_HOST: str = "siem.company.local"
 SIEM_SYSLOG_PORT: int = 514
+
+BLOCKCHAIN_ENABLED: bool = False
