@@ -24,9 +24,9 @@ function App() {
       <div style={{ marginBottom: 10 }}>
         <input type="file" onChange={e => setFile(e.target.files[0])} />
         <button onClick={upload} disabled={!file}>Upload</button>
-      </div>
+          <RulesEditor />\n  </div>
       {status && <p>{status}</p>}
-    </div>
+        <RulesEditor />\n  </div>
   );
 }
 
