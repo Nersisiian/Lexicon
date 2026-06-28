@@ -1,0 +1,9 @@
+{
+  "title": "Lexicon Compliance Platform",
+  "upload": "Upload",
+  "dropzone": "Drop file here or click to select",
+  "status": "Status",
+  "document_id": "Document ID",
+  "upload_success": "Document {{id}} uploaded with status {{status}}",
+  "upload_failed": "Upload failed: {{message}}"
+}

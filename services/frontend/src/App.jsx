@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 
-function App() {
+function UploadForm() {
+  const { t } = useTranslation();
   const [file, setFile] = useState(null);
   const [status, setStatus] = useState('');
   const [docId, setDocId] = useState(null);
@@ -12,21 +14,29 @@ function App() {
     try {
       const res = await axios.post('/v2/documents', formData);
       setDocId(res.data.document_id);
-      setStatus(`Document ${res.data.document_id} uploaded with status ${res.data.status}`);
+      setStatus(t('upload_success', { id: res.data.document_id, status: res.data.status }));
     } catch (err) {
-      setStatus(`Upload failed: ${err.message}`);
+      setStatus(t('upload_failed', { message: err.message }));
     }
   };
 
   return (
-    <div style={{ maxWidth: 600, margin: '0 auto', padding: 20 }}>
-      <h1>Lexicon Compliance Platform</h1>
+    <div>
+      <h1>{t('title')}</h1>
       <div style={{ marginBottom: 10 }}>
         <input type="file" onChange={e => setFile(e.target.files[0])} />
-        <button onClick={upload} disabled={!file}>Upload</button>
-          <RulesEditor />\n  </div>
+        <button onClick={upload} disabled={!file}>{t('upload')}</button>
+      </div>
       {status && <p>{status}</p>}
-        <RulesEditor />\n  </div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UploadForm />
+    </Suspense>
   );
 }
 
