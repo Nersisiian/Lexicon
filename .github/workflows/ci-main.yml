@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [intake-gateway, analytics-engine, external-gateway, ocr-pipeline, document-classifier, compliance-engine, fraud-detection, reasoning-service, audit-ledger, review-workbench, notification-orchestrator]
+        service: [intake-gateway, analytics-engine, external-gateway, predictive-maintenance, ocr-pipeline, document-classifier, compliance-engine, fraud-detection, reasoning-service, audit-ledger, review-workbench, notification-orchestrator]
     permissions:
       contents: read
       packages: write

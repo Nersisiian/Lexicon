@@ -84,6 +84,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8004:8004"
+
+  predictive-maintenance:
+    build:
+      context: ../../services/predictive-maintenance
+      dockerfile: Dockerfile
+    ports:
+      - "8005:8005"
   intake-gateway:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:
