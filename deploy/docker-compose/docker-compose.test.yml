@@ -105,6 +105,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8007:8007"
+
+  webhook-dispatcher:
+    build:
+      context: ../../services/webhook-dispatcher
+      dockerfile: Dockerfile
+    ports:
+      - "8008:8008"
   intake-gateway:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:
