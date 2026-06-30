@@ -126,6 +126,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8011:8011"
+
+  pdf-generator:
+    build:
+      context: ../../services/pdf-generator
+      dockerfile: Dockerfile
+    ports:
+      - "8012:8012"
   intake-gateway:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:
