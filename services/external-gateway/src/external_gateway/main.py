@@ -1,22 +1,29 @@
 from fastapi import FastAPI, HTTPException
 import httpx
 
-app = FastAPI(title="External Gateway", version="1.0")
+app = FastAPI(title="External Gateway", version="2.0")
 
-# Заглушка API для проверки контрагента по санкционным спискам
+OPEN_SANCTIONS_URL = "https://api.opensanctions.org/search/sanctions"
+
 @app.get("/sanctions/check")
 async def sanctions_check(name: str):
-    # В реальном проекте здесь запрос к внешнему API (например, OpenSanctions)
-    # Пока возвращаем статический ответ
-    if "sanctioned" in name.lower():
-        return {"name": name, "sanctioned": True, "details": "Appears on sanctions list"}
-    return {"name": name, "sanctioned": False}
+    params = {"q": name, "limit": 1}
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(OPEN_SANCTIONS_URL, params=params, timeout=10.0)
+            if resp.status_code == 200:
+                data = resp.json()
+                results = data.get("results", [])
+                if results:
+                    return {"name": name, "sanctioned": True, "details": results[0].get("caption", "Sanctioned entity")}
+                return {"name": name, "sanctioned": False}
+            else:
+                raise HTTPException(502, "OpenSanctions API error")
+    except Exception as e:
+        raise HTTPException(502, f"Sanctions check failed: {str(e)}")
 
-# Заглушка для загрузки отчёта из внешней системы
 @app.post("/reports/fetch")
 async def fetch_report(report_type: str, identifier: str):
-    # В production здесь будет вызов внешнего API
-    # Возвращаем имитацию успешной загрузки
     return {
         "report_type": report_type,
         "identifier": identifier,
