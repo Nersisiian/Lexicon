@@ -1,15 +1,20 @@
 name: Security Scan
 on:
-  schedule:
-    - cron: "0 6 * * 1"
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 jobs:
   trivy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Trivy scan
-        run: |
-          for svc in services/*/; do
-            docker build -t temp-image $svc
-            trivy image temp-image
-          done
+      - name: Build analytics-engine image
+        run: docker build -t analytics-engine -f services/analytics-engine/Dockerfile .
+      - name: Run Trivy scan on analytics-engine
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'image'
+          image-ref: 'analytics-engine'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
