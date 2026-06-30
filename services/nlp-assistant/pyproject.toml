@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "nlp-assistant"
 version = "0.1.0"
-description = "Natural language assistant for Lexicon"
+description = "NLP assistant for document queries"
 authors = ["Lexicon Team"]
 
 [tool.poetry.dependencies]

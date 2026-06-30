@@ -3,17 +3,20 @@ from pydantic import BaseModel
 
 app = FastAPI(title="NLP Assistant", version="1.0")
 
-class Question(BaseModel):
-    text: str
+class QueryRequest(BaseModel):
+    question: str
+    context: str = ""   # опциональный контекст
 
-@app.post("/assistant/ask")
-async def ask(question: Question):
-    # В production здесь будет вызов LLM с RAG по логам и документам
-    if "подозрительные" in question.text.lower():
-        return {"answer": "За сегодня обнаружено 3 подозрительных документа: 123, 456, 789"}
-    elif "статус" in question.text.lower():
-        return {"answer": "Документы в обработке: 12. Завершены: 45. Требуют ручной проверки: 5."}
-    return {"answer": "Извините, я пока не могу ответить на этот вопрос. Обратитесь к Runbook."}
+@app.post("/ask")
+async def ask_question(req: QueryRequest):
+    # Заглушка LLM-ответа. В production здесь будет вызов GPT-подобной модели.
+    if "document" in req.question.lower():
+        answer = "According to the records, the document status is 'accepted'."
+    elif "amount" in req.question.lower():
+        answer = "The transaction amount is within allowed limits."
+    else:
+        answer = "I am sorry, I cannot answer that question at the moment."
+    return {"question": req.question, "answer": answer}
 
 @app.get("/health")
 async def health():
