@@ -1,21 +1,16 @@
-# Blockchain Audit Trail
+# Blockchain Audit Trail with Block?Cypher
 
 ## Overview
-Lexicon supports publishing cryptographic hashes of audit events to a Distributed Ledger Technology (DLT) for immutable proof.
+Lexicon publishes cryptographic hashes of audit events to the Ethereum test network via Block?Cypher API.
 
 ## Configuration
-Set `BLOCKCHAIN_ENABLED=true` in environment and provide DLT endpoint credentials.
-
-## Supported DLTs (planned)
-- Hyperledger Fabric
-- Ethereum (via smart contract)
+1. Set `BLOCKCHAIN_ENABLED=true` in environment.
+2. Ensure outbound access to `https://api.blockcypher.com`.
 
 ## How it works
-1. Every audit event is hashed using SHA?256.
-2. The hash is sent to the configured DLT.
-3. The transaction ID is logged and can be used for verification.
+1. Every audit event is hashed (SHA?256).
+2. The hash is sent to Block?Cypher test network endpoint.
+3. The returned transaction ID is logged.
 
 ## Verification
-```bash
-curl http://localhost:8001/audit/verify/<hash>
-(Endpoint to be implemented)
+Visit `https://live.blockcypher.com/eth-test/tx/<txid>` to verify the hash on-chain.
