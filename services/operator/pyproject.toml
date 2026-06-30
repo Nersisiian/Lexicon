@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "lexicon-operator"
+version = "0.1.0"
+description = "Kubernetes Operator for Lexicon"
+authors = ["Lexicon Team"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+kopf = "^1.37"
+kubernetes = "^28.1"
+pyyaml = "^6.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
