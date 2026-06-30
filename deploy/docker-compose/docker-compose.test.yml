@@ -119,6 +119,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8010:8010"
+
+  sandbox-executor:
+    build:
+      context: ../../services/sandbox-executor
+      dockerfile: Dockerfile
+    ports:
+      - "8011:8011"
   intake-gateway:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:
