@@ -98,6 +98,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8006:8006"
+
+  graphql-gateway:
+    build:
+      context: ../../services/graphql-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8007:8007"
   intake-gateway:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:
