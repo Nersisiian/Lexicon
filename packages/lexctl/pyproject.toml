@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "lexctl"
+version = "0.1.0"
+description = "CLI for Lexicon compliance platform"
+authors = ["Lexicon Team"]
+license = "Apache-2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+typer = "^0.12"
+httpx = "^0.27"
+rich = "^13.0"
+
+[tool.poetry.scripts]
+lexctl = "lexctl.cli:app"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
