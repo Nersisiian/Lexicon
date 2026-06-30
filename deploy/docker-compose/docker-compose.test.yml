@@ -112,6 +112,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8008:8008"
+
+  nlp-assistant:
+    build:
+      context: ../../services/nlp-assistant
+      dockerfile: Dockerfile
+    ports:
+      - "8010:8010"
   intake-gateway:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:
