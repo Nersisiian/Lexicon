@@ -199,6 +199,27 @@ services:
     ports:
       - "8014:8014"
     privileged: true
+
+  openfeature-service:
+    build:
+      context: ../../services/openfeature-service
+      dockerfile: Dockerfile
+    ports:
+      - "8015:8015"
+
+  data-catalog:
+    build:
+      context: ../../services/data-catalog
+      dockerfile: Dockerfile
+    ports:
+      - "8016:8016"
+
+  cost-monitor:
+    build:
+      context: ../../services/cost-monitor
+      dockerfile: Dockerfile
+    ports:
+      - "8017:8017"
   intake-gateway:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:
