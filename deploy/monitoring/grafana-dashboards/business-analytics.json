@@ -1,0 +1,29 @@
+{
+  "title": "Lexicon Business Analytics",
+  "panels": [
+    {
+      "title": "Documents per Day",
+      "targets": [
+        {
+          "expr": "avg(documents_per_day)"
+        }
+      ]
+    },
+    {
+      "title": "Status Breakdown",
+      "targets": [
+        {
+          "expr": "sum by (status) (document_status_count)"
+        }
+      ]
+    },
+    {
+      "title": "Processing Time (p95 seconds)",
+      "targets": [
+        {
+          "expr": "processing_time_p95_seconds"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "title": "Lexicon Business Metrics",
+  "panels": [
+    {
+      "title": "Uploads per minute",
+      "targets": [
+        {
+          "expr": "rate(documents_uploaded_total[1m])"
+        }
+      ]
+    },
+    {
+      "title": "Processing time (p95)",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(document_processing_seconds_bucket[5m]))"
+        }
+      ]
+    },
+    {
+      "title": "Auto-approval rate",
+      "targets": [
+        {
+          "expr": "sum(rate(compliance_check_total{status=\"approved\"}[1h])) / sum(rate(compliance_check_total[1h]))"
+        }
+      ]
+    },
+    {
+      "title": "Manual review queue size",
+      "targets": [
+        {
+          "expr": "sum(manual_review_queue_size)"
+        }
+      ]
+    }
+  ]
+}

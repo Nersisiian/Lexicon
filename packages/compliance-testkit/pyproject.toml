@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "compliance-testkit"
+version = "0.1.0"
+description = "Integration test harness for the compliance platform"
+authors = ["QA Team <qa@regulator.internal>"]
+
+[tool.poetry.dependencies]
+pydantic-settings = "^2.0"
+python = "^3.12"
+pytest = "^8.2"
+pytest-asyncio = "^0.23"
+testcontainers = "^4.4"
+aiokafka = "^0.8.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

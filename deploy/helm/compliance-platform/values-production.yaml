@@ -1,0 +1,114 @@
+global:
+  imageTag: stable
+  environment: production
+  imageRegistry: ghcr.io
+  imageOwner: nersisiian
+  imageRepo: lexicon
+  kafkaBootstrapServers: kafka:9092
+
+intake-gateway:
+  enabled: true
+  replicas: 2
+  image: intake-gateway
+  tag: stable
+  databaseUrl: postgresql://compliance:CHANGE_ME@postgres:5432/intake
+  redisUrl: redis://redis:6379
+  minio:
+    endpoint: minio:9000
+    accessKey: ${MINIO_ACCESS_KEY}
+    secretKey: ${MINIO_SECRET_KEY}
+  service:
+    port: 8000
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+ocr-pipeline:
+  enabled: true
+  replicas: 2
+  image: ocr-pipeline
+  tag: stable
+  env:
+    OCR_BACKEND: paddle
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1.5Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+document-classifier:
+  enabled: true
+  replicas: 2
+  image: document-classifier
+  tag: stable
+  env:
+    MODEL_NAME: finreg-bert-classifier
+    DEVICE: cpu
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+compliance-engine:
+  enabled: true
+  replicas: 2
+  image: compliance-engine
+  tag: stable
+  env:
+    SANCTIONS_API_URL: https://api.opensanctions.org
+
+fraud-detection:
+  enabled: true
+  replicas: 2
+  image: fraud-detection
+  tag: stable
+
+reasoning-service:
+  enabled: true
+  replicas: 1
+  image: reasoning-service
+  tag: stable
+  env:
+    LLM_ENDPOINT: http://llm:8080/v1/completions
+
+audit-ledger:
+  enabled: true
+  replicas: 2
+  image: audit-ledger
+  tag: stable
+  databaseUrl: postgresql://compliance:CHANGE_ME@postgres:5432/audit
+  service:
+    port: 8000
+
+review-workbench:
+  enabled: true
+  replicas: 2
+  image: review-workbench
+  tag: stable
+  databaseUrl: postgresql://compliance:CHANGE_ME@postgres:5432/review
+  service:
+    port: 8000
+
+notification-orchestrator:
+  enabled: true
+  replicas: 1
+  image: notification-orchestrator
+  tag: stable
+  env:
+    SLACK_WEBHOOK_URL: https://hooks.slack.com/services/...
+
+
+
+fraud-detection:
+  env:
+    MLFLOW_TRACKING_URI: "http://mlflow:5000"
+    MLFLOW_MODEL_NAME: "fraud_ensemble"

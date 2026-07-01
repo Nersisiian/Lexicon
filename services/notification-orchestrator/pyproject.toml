@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "notification-orchestrator"
+version = "1.0.0"
+description = "Notification dispatch service"
+authors = ["Platform Team <platform@regulator.internal>"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+httpx = "^0.27"
+aiokafka = "^0.14"
+compliance-sdk = { path = "../../packages/compliance-sdk" }
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

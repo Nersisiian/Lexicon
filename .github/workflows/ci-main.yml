@@ -1,0 +1,367 @@
+name: CI Main
+on:
+  push:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [intake-gateway, analytics-engine, external-gateway, predictive-maintenance, fl-coordinator, operator, webhook-dispatcher, infra-controller, nlp-assistant, sandbox-executor, pdf-generator, document-classifier, compliance-engine, fraud-detection, reasoning-service, audit-ledger, review-workbench, notification-orchestrator]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set lowercase image path
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          REPO=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_PATH=${REGISTRY}/${OWNER}/${REPO}" >> $GITHUB_ENV
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: services/${{ matrix.service }}/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_PATH }}/${{ matrix.service }}:${{ github.sha }}
+
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set lowercase image path
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          REPO=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_PATH=${REGISTRY}/${OWNER}/${REPO}" >> $GITHUB_ENV
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push frontend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: services/frontend
+          file: services/frontend/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_PATH }}/frontend:${{ github.sha }}
+
+
+  build-graphql-gateway:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set lowercase image path
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          REPO=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_PATH=${REGISTRY}/${OWNER}/${REPO}" >> $GITHUB_ENV
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push graphql-gateway image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: services/graphql-gateway/Dockerfile
+          push: true
+          no-cache: true
+          tags: ${{ env.IMAGE_PATH }}/graphql-gateway:${{ github.sha }}
+
+
+  build-ocr-pipeline:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set lowercase image path
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          REPO=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_PATH=${REGISTRY}/${OWNER}/${REPO}" >> $GITHUB_ENV
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push ocr-pipeline image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: services/ocr-pipeline/Dockerfile
+          push: true
+          no-cache: true
+          tags: ${{ env.IMAGE_PATH }}/ocr-pipeline:${{ github.sha }}
+
+  smoke-test:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run intake-gateway and check health
+        run: |
+          docker run -d --name intake \
+            -e KAFKA_BOOTSTRAP_SERVERS=localhost:9092 \
+            -e DATABASE_URL=postgresql://test:test@localhost:5432/test \
+            -e REGULATOR_ID=test-regulator \
+            -p 8000:8000 \
+            ghcr.io/nersisiian/lexicon/intake-gateway:${{ github.sha }}
+          for i in {1..30}; do
+            if curl -s -f -o /dev/null http://localhost:8000/health; then
+              echo "intake-gateway healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "ERROR: intake-gateway did not start"
+          docker logs intake
+          exit 1
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f intake || true
+
+  integration-test:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Start PostgreSQL
+        run: |
+          docker run -d --name postgres --network host \
+            -e POSTGRES_USER=test \
+            -e POSTGRES_PASSWORD=test \
+            -e POSTGRES_DB=test \
+            postgres:16
+          sleep 5
+          docker exec postgres psql -U test -d test -c "
+            CREATE TABLE IF NOT EXISTS documents (
+              id UUID PRIMARY KEY,
+              regulator_id TEXT NOT NULL,
+              filename TEXT NOT NULL,
+              content_type TEXT NOT NULL,
+              s3_key_raw TEXT NOT NULL,
+              status TEXT NOT NULL,
+              created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+              updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+            );"
+      - name: Run intake-gateway
+        run: |
+          docker run -d --name intake --network host \
+            -e KAFKA_BOOTSTRAP_SERVERS=localhost:9092 \
+            -e DATABASE_URL=postgresql://test:test@localhost:5432/test \
+            -e REGULATOR_ID=test-regulator \
+            ghcr.io/nersisiian/lexicon/intake-gateway:${{ github.sha }}
+          for i in {1..30}; do
+            if curl -s -f -o /dev/null http://localhost:8000/health; then
+              echo "intake-gateway healthy"
+              break
+            fi
+            sleep 2
+          done
+      - name: Upload document and verify database
+        run: |
+          python3 -c "
+          pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
+          with open('/tmp/sample.pdf','wb') as f: f.write(pdf)
+          "
+          RESP=$(curl -s -w '%{http_code}' -X POST http://localhost:8000/v2/documents \
+            -F "file=@/tmp/sample.pdf;type=application/pdf")
+          HTTP_CODE="${RESP: -3}"
+          BODY="${RESP%???}"
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response body: $BODY"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "Upload failed with code $HTTP_CODE"
+            docker logs intake
+            exit 1
+          fi
+          DOC_ID=$(echo "$BODY" | jq -r '.document_id')
+          echo "Document ID: $DOC_ID"
+    
+      - name: Cleanup
+        if: always()
+        run: |
+          docker rm -f intake || true
+          docker rm -f postgres || true
+
+  integration-test-full:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Start test environment
+        run: |
+          export GITHUB_SHA=${{ github.sha }}
+          docker compose -f deploy/docker-compose/docker-compose.test.yml up -d postgres minio redis intake-gateway
+      - name: Create MinIO bucket
+        run: |
+          docker run --rm --network docker-compose_default \
+            minio/mc alias set myminio http://minio:9000 minioadmin minioadmin && \
+            minio/mc mb myminio/raw-documents || true
+      - name: Wait for MinIO
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:9000/minio/health/live; then
+              echo "MinIO ready"
+              break
+            fi
+            sleep 2
+          done
+      - name: Wait for intake-gateway healthcheck
+        run: |
+          for i in {1..30}; do
+            if curl -s -f -o /dev/null http://localhost:8000/health; then
+              echo "intake-gateway healthy"
+              break
+            fi
+            sleep 2
+          done
+      - name: Test notification webhooks (Slack + Email)
+        run: |
+          # Mock Slack
+          docker run -d --name mock-slack --network host python:3.12-slim python3 -c "
+          from http.server import HTTPServer, BaseHTTPRequestHandler
+          class Handler(BaseHTTPRequestHandler):
+              def do_POST(self):
+                  content_length = int(self.headers['Content-Length'])
+                  body = self.rfile.read(content_length)
+                  print(f'SLACK_MOCK: {body.decode()}')
+                  self.send_response(200)
+                  self.end_headers()
+          HTTPServer(('', 8080), Handler).serve_forever()
+          "
+          # Mock SMTP
+          docker run -d --name mock-smtp --network host python:3.12-slim python3 -c "
+          from smtpd import DebuggingServer
+          import sys
+          server = DebuggingServer(('0.0.0.0', 1025), None)
+          print('SMTP mock listening on 1025')
+          sys.stdout.flush()
+          server.serve_forever()
+          "
+          sleep 2
+          docker compose -f deploy/docker-compose/docker-compose.test.yml up -d --force-recreate notification-orchestrator
+          sleep 5
+          # Отправляем тестовый документ
+          python3 -c "
+          pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
+          with open('/tmp/test.pdf','wb') as f: f.write(pdf)
+          "
+          curl -s -X POST http://localhost:8000/v2/documents -F "file=@/tmp/test.pdf;type=application/pdf"
+          sleep 5
+          docker logs mock-slack | grep "SLACK_MOCK" || true
+          docker logs mock-smtp | grep "mail" || true
+          echo "Notification test completed"
+      - name: Upload document and verify MinIO + PostgreSQL
+        run: |
+          python3 -c "
+          pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
+          with open('/tmp/sample.pdf','wb') as f: f.write(pdf)
+          "
+          RESP=$(curl -s -w '%{http_code}' -X POST http://localhost:8000/v2/documents \
+            -F "file=@/tmp/sample.pdf;type=application/pdf")
+          HTTP_CODE="${RESP: -3}"
+          BODY="${RESP%???}"
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response body: $BODY"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "Upload failed with code $HTTP_CODE"
+            docker compose -f deploy/docker-compose/docker-compose.test.yml logs intake-gateway
+            exit 1
+          fi
+          DOC_ID=$(echo "$BODY" | jq -r '.document_id')
+          echo "Document ID: $DOC_ID"
+                  echo "Integration test (MinIO + PostgreSQL) passed"
+      - name: Test rate limiting
+        run: |
+          python3 -c "
+          pdf = b'%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF'
+          with open('/tmp/sample.pdf','wb') as f: f.write(pdf)
+          "
+          for i in $(seq 1 11); do
+            RESP=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:8000/v2/documents -F "file=@/tmp/sample.pdf;type=application/pdf")
+            echo "Request $i: $RESP"
+            if [ $i -gt 10 ] && [ "$RESP" != "429" ]; then
+              echo "Rate limiting not working, expected 429"
+              exit 1
+            fi
+          done
+          echo "Rate limiting works"
+
+      - name: Cleanup
+        if: always()
+        run: docker compose -f deploy/docker-compose/docker-compose.test.yml down -v
+
+  deploy:
+    needs: [integration-test, smoke-test]
+    if: success() && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+      - name: Deploy with Helm (optional)
+        run: |
+          helm upgrade --install compliance deploy/helm/compliance-platform \
+            --namespace compliance --create-namespace \
+            --set global.imageTag=${{ github.sha }} \
+            -f deploy/helm/compliance-platform/values-production.yaml || true

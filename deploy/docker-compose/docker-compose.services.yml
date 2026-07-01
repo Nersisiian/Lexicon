@@ -1,0 +1,102 @@
+version: "3.8"
+services:
+  intake-gateway:
+    build:
+      context: ../..
+      dockerfile: services/intake-gateway/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://compliance:compliance@postgres:5432/intake
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - kafka
+      - postgres
+      - redis
+      - minio
+  ocr-pipeline:
+    build:
+      context: ../..
+      dockerfile: services/ocr-pipeline/Dockerfile
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - kafka
+  document-classifier:
+    build:
+      context: ../..
+      dockerfile: services/document-classifier/Dockerfile
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - kafka
+  compliance-engine:
+    build:
+      context: ../..
+      dockerfile: services/compliance-engine/Dockerfile
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - kafka
+  fraud-detection:
+    build:
+      context: ../..
+      dockerfile: services/fraud-detection/Dockerfile
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - kafka
+  reasoning-service:
+    build:
+      context: ../..
+      dockerfile: services/reasoning-service/Dockerfile
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - kafka
+  audit-ledger:
+    build:
+      context: ../..
+      dockerfile: services/audit-ledger/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://compliance:compliance@postgres:5432/audit
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8001:8000"
+    depends_on:
+      - kafka
+      - postgres
+  review-workbench:
+    build:
+      context: ../..
+      dockerfile: services/review-workbench/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://compliance:compliance@postgres:5432/review
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8002:8000"
+    depends_on:
+      - kafka
+      - postgres
+  notification-orchestrator:
+    build:
+      context: ../..
+      dockerfile: services/notification-orchestrator/Dockerfile
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - kafka
+
+
+
+
+
+
+
+
+
+
+

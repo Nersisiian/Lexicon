@@ -1,0 +1,13 @@
+apiVersion: v1
+entries:
+  compliance-platform:
+  - apiVersion: v2
+    appVersion: 2.5.1
+    created: "2026-07-01T16:55:13.608319417Z"
+    description: Helm chart for the AI Document Compliance Platform
+    digest: fcec68fc6fcfa96e6b54870373718080d0fd0cb727749997d531d54eaef39a2a
+    name: compliance-platform
+    urls:
+    - https://nersisiian.github.io/Lexicon/compliance-platform-1.0.0.tgz
+    version: 1.0.0
+generated: "2026-07-01T16:55:13.607585642Z"

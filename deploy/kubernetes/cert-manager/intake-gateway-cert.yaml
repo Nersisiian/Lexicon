@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: intake-gateway-tls
+  namespace: compliance
+spec:
+  secretName: intake-gateway-tls
+  issuerRef:
+    name: selfsigned-issuer
+    kind: Issuer
+  commonName: intake-gateway.compliance.svc
+  dnsNames:
+    - intake-gateway
+    - intake-gateway.compliance.svc
+    - intake-gateway.compliance.svc.cluster.local
+

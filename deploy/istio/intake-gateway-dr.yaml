@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: intake-gateway-versions
+  namespace: compliance
+spec:
+  host: intake-gateway
+  subsets:
+    - name: stable
+      labels:
+        version: stable
+    - name: experimental
+      labels:
+        version: experimental

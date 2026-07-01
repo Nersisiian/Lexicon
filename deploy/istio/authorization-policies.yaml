@@ -1,0 +1,59 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-intake-to-ocr
+  namespace: compliance
+spec:
+  selector:
+    matchLabels:
+      app: ocr-pipeline
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/compliance/sa/intake-gateway"]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-intake-to-compliance
+  namespace: compliance
+spec:
+  selector:
+    matchLabels:
+      app: compliance-engine
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/compliance/sa/intake-gateway"]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-compliance-to-fraud
+  namespace: compliance
+spec:
+  selector:
+    matchLabels:
+      app: fraud-detection
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/compliance/sa/compliance-engine"]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-intake-to-analytics
+  namespace: compliance
+spec:
+  selector:
+    matchLabels:
+      app: analytics-engine
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/compliance/sa/intake-gateway"]

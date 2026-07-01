@@ -1,0 +1,22 @@
+name: Release Helm Chart
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release-chart:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Package Helm chart
+        run: |
+          helm package deploy/helm/compliance-platform --destination .deploy
+
+      - name: Upload chart to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: .deploy/*.tgz

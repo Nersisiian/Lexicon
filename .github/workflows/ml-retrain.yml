@@ -1,0 +1,106 @@
+name: ML Retrain
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'   # каждое воскресенье в 03:00 UTC
+  workflow_dispatch:
+
+env:
+  MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI || 'http://localhost:5000' }}
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install scikit-learn pandas psycopg2-binary mlflow
+
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U test; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+
+      - name: Create training table
+        run: |
+          psql -h localhost -U test -d test -c "
+            CREATE TABLE IF NOT EXISTS training_data (
+              id SERIAL PRIMARY KEY,
+              features JSONB NOT NULL,
+              label INTEGER NOT NULL
+            );
+          "
+
+      - name: Insert sample training data
+        run: |
+          psql -h localhost -U test -d test -c "
+            INSERT INTO training_data (features, label) VALUES
+              ('{\"amount\": 10000, \"counterparty\": 1}', 0),
+              ('{\"amount\": 50000, \"counterparty\": 2}', 1)
+            ON CONFLICT DO NOTHING;
+          "
+
+      - name: Train model
+        run: |
+          python -c "
+          import psycopg2, json, pandas as pd
+          from sklearn.ensemble import RandomForestClassifier
+          import mlflow, joblib, os
+
+          # Загрузка данных
+          conn = psycopg2.connect('postgresql://test:test@localhost:5432/test')
+          df = pd.read_sql('SELECT * FROM training_data', conn)
+          X = pd.DataFrame(df['features'].apply(json.loads).tolist())
+          y = df['label']
+
+          # Обучение
+          model = RandomForestClassifier()
+          model.fit(X, y)
+
+          # Сохранение локально
+          os.makedirs('/tmp/models', exist_ok=True)
+          joblib.dump(model, '/tmp/models/fraud_model.pkl')
+
+          # Регистрация в MLflow
+          mlflow.set_tracking_uri(os.getenv('MLFLOW_TRACKING_URI', 'http://localhost:5000'))
+          mlflow.set_experiment('fraud-retrain')
+          with mlflow.start_run():
+              mlflow.sklearn.log_model(model, 'fraud_model')
+              mlflow.log_metric('accuracy', model.score(X, y))
+          "
+
+      - name: Upload model artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fraud-model
+          path: /tmp/models/fraud_model.pkl
+
+      - name: Notify Slack (optional)
+        if: failure()
+        run: |
+          echo "Model retraining failed. Check logs."
+          # curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} -d '{"text":"ML retrain failed"}'

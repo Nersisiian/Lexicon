@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  kafka:
+    extends:
+      file: docker-compose.base.yml
+      service: kafka
+  postgres:
+    extends:
+      file: docker-compose.base.yml
+      service: postgres
+  redis:
+    extends:
+      file: docker-compose.base.yml
+      service: redis
+  minio:
+    extends:
+      file: docker-compose.base.yml
+      service: minio

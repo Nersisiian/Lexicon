@@ -1,0 +1,37 @@
+_format_version: "3.0"
+services:
+  - name: intake-gateway
+    url: http://intake-gateway:8000
+    routes:
+      - name: intake-route
+        paths:
+          - /api/v2
+        strip_path: true
+  - name: analytics-engine
+    url: http://analytics-engine:8003
+    routes:
+      - name: analytics-route
+        paths:
+          - /analytics
+        strip_path: true
+  - name: review-workbench
+    url: http://review-workbench:8002
+    routes:
+      - name: review-route
+        paths:
+          - /review
+        strip_path: true
+  - name: graphql-gateway
+    url: http://graphql-gateway:8007
+    routes:
+      - name: graphql-route
+        paths:
+          - /graphql
+        strip_path: true
+  - name: frontend
+    url: http://frontend:3000
+    routes:
+      - name: frontend-route
+        paths:
+          - /
+        strip_path: false

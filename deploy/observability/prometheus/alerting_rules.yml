@@ -1,0 +1,44 @@
+groups:
+  - name: compliance-platform
+    rules:
+      - alert: HighKafkaConsumerLag
+        expr: kafka_consumer_lag_records > 5000
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kafka consumer lag > 5000 for {{ $labels.topic }}"
+          description: "Consumer group {{ $labels.consumer_group }} is falling behind on topic {{ $labels.topic }}. Current lag: {{ $value }}"
+      - alert: OCRProcessingSlow
+        expr: histogram_quantile(0.99, document_processing_seconds_bucket{stage="ocr"}) > 45
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "OCR p99 latency > 45s"
+          description: "OCR processing is degraded. p99 latency is {{ $value }}s"
+      - alert: CircuitBreakerOpen
+        expr: circuit_breaker_state == 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Circuit breaker {{ $labels.name }} is open"
+          description: "Circuit breaker has been open for more than 1 minute"
+      - alert: LowAutoApprovalRate
+        expr: rate(document_processed_total{status="passed"}[15m]) / rate(document_processed_total{status=~"passed|pending_review"}[15m]) < 0.5
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Auto-approval rate below 50%"
+          description: "The automatic approval rate has dropped below 50% in the last 15 minutes. Check compliance rules and document quality."
+      - alert: ReviewQueueGrowing
+        expr: rate(document_processed_total{status="pending_review"}[30m]) * 3600 > 20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Review queue growing"
+          description: "More than 20 documents per hour are being sent for manual review. Consider scaling the review team."
+

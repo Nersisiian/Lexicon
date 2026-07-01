@@ -1,0 +1,19 @@
+name: Publish Security Advisory
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.well-known/security.txt'
+jobs:
+  advisory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate security.txt
+        run: |
+          if grep -q "Contact:" .well-known/security.txt; then
+            echo "security.txt is valid"
+          else
+            echo "security.txt missing Contact field"
+            exit 1
+          fi
