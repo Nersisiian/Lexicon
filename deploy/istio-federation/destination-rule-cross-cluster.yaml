@@ -1,0 +1,10 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: cross-cluster-mtls
+  namespace: compliance
+spec:
+  host: "*.eu-west.lexicon.internal"
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
