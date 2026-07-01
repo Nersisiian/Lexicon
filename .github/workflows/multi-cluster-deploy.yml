@@ -1,0 +1,40 @@
+name: Multi-Cluster Deploy
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+jobs:
+  deploy-us-east:
+    runs-on: ubuntu-latest
+    environment: us-east
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG_US_EAST }}" | base64 -d > $HOME/.kube/config
+      - name: Deploy to us-east
+        run: |
+          helm upgrade --install lexicon-us-east deploy/helm/compliance-platform \
+            -f deploy/multi-cluster/values-us-east.yaml \
+            --namespace compliance --create-namespace \
+            --set global.imageTag=${{ github.sha }}
+
+  deploy-eu-west:
+    runs-on: ubuntu-latest
+    environment: eu-west
+    needs: deploy-us-east
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG_EU_WEST }}" | base64 -d > $HOME/.kube/config
+      - name: Deploy to eu-west
+        run: |
+          helm upgrade --install lexicon-eu-west deploy/helm/compliance-platform \
+            -f deploy/multi-cluster/values-eu-west.yaml \
+            --namespace compliance --create-namespace \
+            --set global.imageTag=${{ github.sha }}
