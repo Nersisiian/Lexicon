@@ -169,7 +169,6 @@ services:
     depends_on:
       - intake-gateway
       - analytics-engine
-      - review-workbench
       - graphql-gateway
       - frontend
   intake-gateway:
