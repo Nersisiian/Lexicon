@@ -184,6 +184,13 @@ services:
       - analytics-engine
       - graphql-gateway
       - frontend
+
+  feature-flags:
+    build:
+      context: ../../services/feature-flags
+      dockerfile: Dockerfile
+    ports:
+      - "8013:8013"
   intake-gateway:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:
