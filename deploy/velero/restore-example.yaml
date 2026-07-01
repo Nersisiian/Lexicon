@@ -1,0 +1,12 @@
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  name: restore-from-backup
+  namespace: velero
+spec:
+  backupName: daily-backup
+  includedNamespaces:
+    - compliance
+    - argocd
+    - istio-system
+  restorePVs: true
