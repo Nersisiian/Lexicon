@@ -1,18 +1,17 @@
 # Chaos Engineering with LitmusChaos
 
-## 1. Install LitmusChaos
+## Experiments
+- **pod-delete**: Random pod deletion
+- **network-loss**: Complete network loss on intake-gateway
+- **pod-network-loss**: 50% packet loss on OCR pipeline
+- **node-drain**: Node drain simulating AZ failure
+
+## Run Experiment
 ```bash
-kubectl apply -f https://litmuschaos.github.io/litmus/litmus-operator-v3.0.0.yaml
-2. Run Experiment
-bash
-kubectl apply -f chaos/experiments/pod-delete.yaml
-3. Observe
-Grafana dashboard: check error rate, latency, pod restarts.
+kubectl apply -f chaos/experiments/<experiment>.yaml
+Observe
+Grafana: error rate, latency, pod restarts
 
-Rate limiting should protect the service.
+HPA/KEDA should scale up replacement pods
 
-HPA should scale up if needed.
-
-4. Cleanup
-bash
-kubectl delete chaosengine lexicon-chaos -n compliance
+Istio should reroute traffic

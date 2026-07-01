@@ -1,0 +1,24 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: network-loss
+  namespace: compliance
+spec:
+  appinfo:
+    appns: compliance
+    applabel: app=intake-gateway
+    appkind: deployment
+  chaosServiceAccount: litmus-admin
+  experiments:
+    - name: network-loss
+      spec:
+        components:
+          env:
+            - name: TOTAL_CHAOS_DURATION
+              value: "120"
+            - name: CHAOS_INTERVAL
+              value: "30"
+            - name: NETWORK_INTERFACE
+              value: "eth0"
+            - name: TARGET_CONTAINER
+              value: "intake-gateway"

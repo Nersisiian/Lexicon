@@ -1,0 +1,22 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: node-drain
+  namespace: compliance
+spec:
+  appinfo:
+    appns: compliance
+    applabel: app=document-classifier
+    appkind: deployment
+  chaosServiceAccount: litmus-admin
+  experiments:
+    - name: node-drain
+      spec:
+        components:
+          env:
+            - name: TOTAL_CHAOS_DURATION
+              value: "120"
+            - name: CHAOS_INTERVAL
+              value: "30"
+            - name: TARGET_NODE
+              value: "worker-node-1"
