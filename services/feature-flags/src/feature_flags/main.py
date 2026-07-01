@@ -2,7 +2,6 @@ from fastapi import FastAPI
 
 app = FastAPI(title="Feature Flags", version="1.0")
 
-# In-memory storage (replace with Redis/DB for production)
 flags = {
     "new_dashboard": True,
     "experimental_ui": False,
