@@ -20,7 +20,6 @@ receivers:
     pagerduty_configs:
       - routing_key: 'YOUR_PAGERDUTY_INTEGRATION_KEY_CRITICAL'
         severity: critical
-
   - name: 'pagerduty-warning'
     pagerduty_configs:
       - routing_key: 'YOUR_PAGERDUTY_INTEGRATION_KEY_WARNING'
