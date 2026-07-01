@@ -220,6 +220,15 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8017:8017"
+
+  edge-agent:
+    build:
+      context: ../../services/edge-agent
+      dockerfile: Dockerfile
+    ports:
+      - "8018:8018"
+    environment:
+      CENTRAL_GATEWAY: http://intake-gateway:8000
   intake-gateway:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:
