@@ -1,0 +1,20 @@
+- rule: Suspicious Shell Spawn
+  desc: Detect shell spawned by a container
+  condition: proc.name in (bash, sh, zsh) and container.id != host
+  output: "Shell spawned in container (user=%user.name container=%container.name cmd=%proc.cmdline)"
+  priority: WARNING
+  tags: [lexicon, shell]
+
+- rule: Unexpected Network Connection
+  desc: Outbound connection to unexpected external IP
+  condition: outbound and fd.sport != 8000 and fd.sport != 9092 and fd.sport != 5432
+  output: "Unexpected outbound connection (container=%container.name dest=%fd.rip:%fd.rport)"
+  priority: WARNING
+  tags: [lexicon, network]
+
+- rule: File Access in Sensitive Directory
+  desc: Access to /etc or /var in a container
+  condition: open_read and (fd.name contains /etc/ or fd.name contains /var/) and container.id != host
+  output: "File access in sensitive directory (container=%container.name file=%fd.name)"
+  priority: WARNING
+  tags: [lexicon, filesystem]

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falco-alertmanager
+  namespace: compliance
+data:
+  alertmanager.yaml: |
+    receivers:
+      - name: 'pagerduty-critical'
+        pagerduty_configs:
+          - routing_key: 'YOUR_PAGERDUTY_INTEGRATION_KEY'
+            severity: critical
