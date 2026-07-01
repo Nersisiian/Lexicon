@@ -1,0 +1,34 @@
+name: Publish Helm Chart
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'deploy/helm/compliance-platform/**'
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Package Helm chart
+        run: |
+          helm package deploy/helm/compliance-platform --destination .deploy
+
+      - name: Update Helm repo index
+        run: |
+          git fetch origin gh-pages || true
+          git checkout gh-pages || git checkout --orphan gh-pages
+          git rm -r --cached . || true
+          helm repo index .deploy --url https://nersisiian.github.io/Lexicon
+          cp .deploy/* .
+          git add .
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git commit -m "Update Helm repository" || true
+          git push origin gh-pages
