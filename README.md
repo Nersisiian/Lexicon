@@ -476,3 +476,5 @@ Maintained by the **RegTech Platform Engineering Division**.
 ```bash
 helm repo add lexicon https://nersisiian.github.io/Lexicon
 helm install compliance lexicon/compliance-platform -n compliance --create-namespace
+
+
