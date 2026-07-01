@@ -191,6 +191,14 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8013:8013"
+
+  ebpf-agent:
+    build:
+      context: ../../services/ebpf-agent
+      dockerfile: Dockerfile
+    ports:
+      - "8014:8014"
+    privileged: true
   intake-gateway:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:

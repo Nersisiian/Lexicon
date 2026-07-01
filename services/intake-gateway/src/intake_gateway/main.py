@@ -28,6 +28,15 @@ async def rate_limit_middleware(request: Request, call_next):
     hits[ip].append(now)
     return await call_next(request)
 
+
+@app.middleware("http")
+async def profiling_middleware(request: Request, call_next):
+    start = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
+
 app.include_router(router)
 
 @app.on_event("startup")
