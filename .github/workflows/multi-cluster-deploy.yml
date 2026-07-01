@@ -11,12 +11,14 @@ jobs:
     environment: us-east
     steps:
       - uses: actions/checkout@v4
-      - name: Configure kubectl
+      - name: Configure kubectl and deploy
         run: |
+          if [ -z "${{ secrets.KUBE_CONFIG_US_EAST }}" ]; then
+            echo "No KUBE_CONFIG_US_EAST secret, skipping us-east deployment"
+            exit 0
+          fi
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBE_CONFIG_US_EAST }}" | base64 -d > $HOME/.kube/config
-      - name: Deploy to us-east
-        run: |
           helm upgrade --install lexicon-us-east deploy/helm/compliance-platform \
             -f deploy/multi-cluster/values-us-east.yaml \
             --namespace compliance --create-namespace \
@@ -28,12 +30,14 @@ jobs:
     needs: deploy-us-east
     steps:
       - uses: actions/checkout@v4
-      - name: Configure kubectl
+      - name: Configure kubectl and deploy
         run: |
+          if [ -z "${{ secrets.KUBE_CONFIG_EU_WEST }}" ]; then
+            echo "No KUBE_CONFIG_EU_WEST secret, skipping eu-west deployment"
+            exit 0
+          fi
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBE_CONFIG_EU_WEST }}" | base64 -d > $HOME/.kube/config
-      - name: Deploy to eu-west
-        run: |
           helm upgrade --install lexicon-eu-west deploy/helm/compliance-platform \
             -f deploy/multi-cluster/values-eu-west.yaml \
             --namespace compliance --create-namespace \
