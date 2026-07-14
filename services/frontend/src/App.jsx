@@ -26,15 +26,15 @@ function UploadForm() {
       <div style={{ marginBottom: 10 }}>
         <input type="file" onChange={e => setFile(e.target.files[0])} />
         <button onClick={upload} disabled={!file}>{t('upload')}</button>
-      </div>
+          <RuleBuilder />\n  </div>
       {status && <p>{status}</p>}
-    </div>
+        <RuleBuilder />\n  </div>
   );
 }
 
 function App() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>Loading...    <RuleBuilder />\n  </div>}>
       <UploadForm />
     </Suspense>
   );
