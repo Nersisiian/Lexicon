@@ -1,0 +1,34 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: production-network-loss
+  namespace: compliance
+spec:
+  appinfo:
+    appns: compliance
+    applabel: app=ocr-pipeline
+    appkind: deployment
+  chaosServiceAccount: litmus-admin
+  annotationCheck: 'true'
+  engineState: 'active'
+  experiments:
+    - name: network-loss
+      spec:
+        components:
+          env:
+            - name: TOTAL_CHAOS_DURATION
+              value: "60"
+            - name: CHAOS_INTERVAL
+              value: "15"
+            - name: NETWORK_INTERFACE
+              value: "eth0"
+            - name: TARGET_CONTAINER
+              value: "ocr-pipeline"
+            - name: BLAST_RADIUS
+              value: "1"
+            - name: AUTO_ABORT_CONDITIONS
+              value: >
+                {
+                  "errorRate": "gt:10",
+                  "latencyP99": "gt:5000"
+                }
