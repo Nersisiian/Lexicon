@@ -180,7 +180,7 @@ jobs:
             -e POSTGRES_DB=test \
             postgres:16
           sleep 5
-          docker exec postgres psql -U test -d test -c "
+          docker exec -e PGPASSWORD=test postgres psql -U test -d test -c "
             CREATE TABLE IF NOT EXISTS documents (
               id UUID PRIMARY KEY,
               regulator_id TEXT NOT NULL,
