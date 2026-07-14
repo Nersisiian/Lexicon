@@ -229,6 +229,20 @@ services:
       - "8018:8018"
     environment:
       CENTRAL_GATEWAY: http://intake-gateway:8000
+
+  federation-gateway:
+    build:
+      context: ../../services/federation-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8018:8018"
+
+  predictive-scaler:
+    build:
+      context: ../../services/predictive-scaler
+      dockerfile: Dockerfile
+    ports:
+      - "8019:8019"
   intake-gateway:
     image: ghcr.io/nersisiian/lexicon/intake-gateway:${GITHUB_SHA:-latest}
     environment:
